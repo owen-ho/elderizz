@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const ElderlyDatingApp());
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://npemdwlhzelkqdyupuzu.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wZW1kd2xoemVsa3FkeXVwdXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODg3NzgsImV4cCI6MjA3Mzg2NDc3OH0.htNqcHH_IdaJIPvI2kIN3v1zbdEectRPuAQ8OQMW6O0',
+  );
+  runApp(ElderlyDatingApp());
 }
 
 class ElderlyDatingApp extends StatelessWidget {
@@ -33,14 +41,14 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  
+
   final List<Widget> _screens = [
     const ExplorePage(),
     const DiscoverPage(),
     const ChatPage(),
     const ProfilePage(),
   ];
-// jsbdbvid sv
+  // jsbdbvid sv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,22 +64,10 @@ class _MainScreenState extends State<MainScreen> {
         selectedItemColor: Colors.teal,
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Discover',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Discover'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
@@ -127,7 +123,8 @@ class DataService {
         name: 'Margaret Johnson',
         age: 68,
         location: 'New York, NY',
-        bio: 'Love gardening, reading, and spending time with my grandchildren. Looking for someone to share life\'s adventures with.',
+        bio:
+            'Love gardening, reading, and spending time with my grandchildren. Looking for someone to share life\'s adventures with.',
         interests: ['Gardening', 'Reading', 'Cooking', 'Travel'],
         profileImage: '👩‍🦳',
         status: 'online',
@@ -137,7 +134,8 @@ class DataService {
         name: 'Robert Smith',
         age: 72,
         location: 'Los Angeles, CA',
-        bio: 'Retired teacher who enjoys hiking, photography, and good conversation. Seeking a kind companion for this chapter of life.',
+        bio:
+            'Retired teacher who enjoys hiking, photography, and good conversation. Seeking a kind companion for this chapter of life.',
         interests: ['Photography', 'Hiking', 'Movies', 'Music'],
         profileImage: '👨‍🦳',
         status: 'offline',
@@ -147,7 +145,8 @@ class DataService {
         name: 'Dorothy Williams',
         age: 65,
         location: 'Chicago, IL',
-        bio: 'Recently widowed, ready to find joy again. Love painting, bridge, and volunteer work at the local shelter.',
+        bio:
+            'Recently widowed, ready to find joy again. Love painting, bridge, and volunteer work at the local shelter.',
         interests: ['Painting', 'Bridge', 'Volunteering', 'Dancing'],
         profileImage: '👵',
         status: 'online',
@@ -157,7 +156,8 @@ class DataService {
         name: 'Frank Miller',
         age: 70,
         location: 'Miami, FL',
-        bio: 'Widower looking for companionship. Enjoy fishing, golf, and cooking for someone special.',
+        bio:
+            'Widower looking for companionship. Enjoy fishing, golf, and cooking for someone special.',
         interests: ['Fishing', 'Golf', 'Cooking', 'Travel'],
         profileImage: '👴',
         status: 'online',
@@ -171,7 +171,8 @@ class DataService {
         id: '1',
         senderId: '1',
         receiverId: 'current_user',
-        message: 'Hello! I saw your profile and thought we might have a lot in common.',
+        message:
+            'Hello! I saw your profile and thought we might have a lot in common.',
         timestamp: DateTime.now().subtract(const Duration(hours: 2)),
       ),
       ChatMessage(
@@ -247,7 +248,11 @@ class _ExplorePageState extends State<ExplorePage> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(Icons.location_on, color: Colors.grey, size: 18),
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Colors.grey,
+                                  size: 18,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   users[currentIndex].location,
@@ -274,7 +279,9 @@ class _ExplorePageState extends State<ExplorePage> {
                             const SizedBox(height: 8),
                             Wrap(
                               spacing: 8,
-                              children: users[currentIndex].interests.map((interest) {
+                              children: users[currentIndex].interests.map((
+                                interest,
+                              ) {
                                 return Chip(
                                   label: Text(interest),
                                   backgroundColor: Colors.teal.shade100,
@@ -353,8 +360,21 @@ class _DiscoverPageState extends State<DiscoverPage> {
   String selectedInterest = 'All Interests';
 
   final List<String> ageRanges = ['All Ages', '60-65', '66-70', '71-75', '76+'];
-  final List<String> locations = ['All Locations', 'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Miami, FL'];
-  final List<String> interests = ['All Interests', 'Gardening', 'Reading', 'Photography', 'Cooking', 'Travel'];
+  final List<String> locations = [
+    'All Locations',
+    'New York, NY',
+    'Los Angeles, CA',
+    'Chicago, IL',
+    'Miami, FL',
+  ];
+  final List<String> interests = [
+    'All Interests',
+    'Gardening',
+    'Reading',
+    'Photography',
+    'Cooking',
+    'Travel',
+  ];
 
   @override
   void initState() {
@@ -471,7 +491,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                            const Icon(
+                              Icons.location_on,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(width: 4),
                             Text(user.location),
                           ],
@@ -491,7 +515,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           width: 10,
                           height: 10,
                           decoration: BoxDecoration(
-                            color: user.status == 'online' ? Colors.green : Colors.grey,
+                            color: user.status == 'online'
+                                ? Colors.green
+                                : Colors.grey,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -519,10 +545,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   void _applyFilters() {
     filteredUsers = users.where((user) {
-      bool ageMatch = selectedAgeRange == 'All Ages' || _isAgeInRange(user.age, selectedAgeRange);
-      bool locationMatch = selectedLocation == 'All Locations' || user.location == selectedLocation;
-      bool interestMatch = selectedInterest == 'All Interests' || user.interests.contains(selectedInterest);
-      
+      bool ageMatch = selectedAgeRange == 'All Ages' ||
+          _isAgeInRange(user.age, selectedAgeRange);
+      bool locationMatch = selectedLocation == 'All Locations' ||
+          user.location == selectedLocation;
+      bool interestMatch = selectedInterest == 'All Interests' ||
+          user.interests.contains(selectedInterest);
+
       return ageMatch && locationMatch && interestMatch;
     }).toList();
   }
@@ -575,10 +604,15 @@ class _ChatPageState extends State<ChatPage> {
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final message = messages[index];
-                final sender = users.firstWhere((user) => user.id == message.senderId);
-                
+                final sender = users.firstWhere(
+                  (user) => user.id == message.senderId,
+                );
+
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: ListTile(
                     leading: CircleAvatar(
                       child: Text(
@@ -614,7 +648,7 @@ class _ChatPageState extends State<ChatPage> {
   String _formatTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {
@@ -644,12 +678,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     super.initState();
     _messages.addAll([
       {
-        'message': 'Hello! I saw your profile and thought we might have a lot in common.',
+        'message':
+            'Hello! I saw your profile and thought we might have a lot in common.',
         'isMe': false,
         'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
       },
       {
-        'message': 'Hi! Thank you for reaching out. I\'d love to get to know you better.',
+        'message':
+            'Hi! Thank you for reaching out. I\'d love to get to know you better.',
         'isMe': true,
         'timestamp': DateTime.now().subtract(const Duration(hours: 1)),
       },
@@ -853,7 +889,8 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
-              children: ['Hiking', 'Reading', 'Cooking', 'Travel', 'Movies'].map((interest) {
+              children: ['Hiking', 'Reading', 'Cooking', 'Travel', 'Movies']
+                  .map((interest) {
                 return Chip(
                   label: Text(interest),
                   backgroundColor: Colors.teal.shade100,
@@ -963,7 +1000,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _ageController = TextEditingController(text: '65');
   final _locationController = TextEditingController(text: 'Boston, MA');
   final _bioController = TextEditingController(
-    text: 'Retired engineer who loves to stay active. Enjoy hiking, reading mystery novels, and cooking for friends and family. Looking for someone special to share new adventures with.',
+    text:
+        'Retired engineer who loves to stay active. Enjoy hiking, reading mystery novels, and cooking for friends and family. Looking for someone special to share new adventures with.',
   );
 
   @override
@@ -1076,15 +1114,25 @@ class OtherProfilePage extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     '${user.name}, ${user.age}',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.location_on, color: Colors.grey, size: 18),
+                      const Icon(
+                        Icons.location_on,
+                        color: Colors.grey,
+                        size: 18,
+                      ),
                       const SizedBox(width: 4),
-                      Text(user.location, style: const TextStyle(color: Colors.grey)),
+                      Text(
+                        user.location,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -1095,7 +1143,9 @@ class OtherProfilePage extends StatelessWidget {
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: user.status == 'online' ? Colors.green : Colors.grey,
+                          color: user.status == 'online'
+                              ? Colors.green
+                              : Colors.grey,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -1103,7 +1153,9 @@ class OtherProfilePage extends StatelessWidget {
                       Text(
                         user.status == 'online' ? 'Online' : 'Offline',
                         style: TextStyle(
-                          color: user.status == 'online' ? Colors.green : Colors.grey,
+                          color: user.status == 'online'
+                              ? Colors.green
+                              : Colors.grey,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1118,10 +1170,7 @@ class OtherProfilePage extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(
-              user.bio,
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(user.bio, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
             const Text(
               'Interests',
@@ -1151,7 +1200,10 @@ class OtherProfilePage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.favorite, color: Colors.white),
-                    label: const Text('Like', style: TextStyle(color: Colors.white)),
+                    label: const Text(
+                      'Like',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(vertical: 15),
@@ -1170,7 +1222,10 @@ class OtherProfilePage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.message, color: Colors.white),
-                    label: const Text('Message', style: TextStyle(color: Colors.white)),
+                    label: const Text(
+                      'Message',
+                      style: TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.teal,
                       padding: const EdgeInsets.symmetric(vertical: 15),
@@ -1187,7 +1242,10 @@ class OtherProfilePage extends StatelessWidget {
                   _showReportDialog(context, user.name);
                 },
                 icon: const Icon(Icons.report, color: Colors.red),
-                label: const Text('Report User', style: TextStyle(color: Colors.red)),
+                label: const Text(
+                  'Report User',
+                  style: TextStyle(color: Colors.red),
+                ),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.red),
                   padding: const EdgeInsets.symmetric(vertical: 15),
@@ -1206,7 +1264,9 @@ class OtherProfilePage extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Report $userName'),
-          content: const Text('Are you sure you want to report this user? This action will be reviewed by our moderation team.'),
+          content: const Text(
+            'Are you sure you want to report this user? This action will be reviewed by our moderation team.',
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -1219,7 +1279,9 @@ class OtherProfilePage extends StatelessWidget {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('User reported. Thank you for keeping our community safe.'),
+                    content: Text(
+                      'User reported. Thank you for keeping our community safe.',
+                    ),
                     backgroundColor: Colors.orange,
                   ),
                 );
