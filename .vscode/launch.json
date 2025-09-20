@@ -4,20 +4,19 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
         {
-            "name": "myapp",
+            "name": "Elderizz",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "myapp (profile mode)",
+            "name": "Elderizz (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "myapp (release mode)",
+            "name": "Elderizz (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
