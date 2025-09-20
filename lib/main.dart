@@ -501,8 +501,8 @@ class DataService {
       final users = await SupabaseService.getDiscoverableUsers();
       if (users.isNotEmpty) {
         // TODO: Make sample users so dont need sample
-        return users.cast<UserModel>();
-        // return [...getSampleUsers(), ...users.cast<UserModel>()];
+        // return users.cast<UserModel>();
+        return [...getSampleUsers(), ...users.cast<UserModel>()];
       }
     } catch (e) {
       print('Error fetching users from Supabase: $e');
@@ -539,6 +539,7 @@ class DataService {
 
   static Future<List<ChatMessage>> getMessages() async {
     try {
+      return getSampleMessages();
       // Try to get conversations from Supabase
       final conversations = await SupabaseService.getConversations();
       if (conversations.isNotEmpty) {
