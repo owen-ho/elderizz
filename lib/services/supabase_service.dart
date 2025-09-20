@@ -7,7 +7,7 @@ class SupabaseService {
   static SupabaseClient get client => _client;
 
   // Authentication
-  static SupabaseUser? get currentUser => _client.auth.currentUser;
+  static User? get currentUser => _client.auth.currentUser;
   static String? get currentUserId => _client.auth.currentUser?.id;
 
   // Sign up with email and password
@@ -104,7 +104,7 @@ class SupabaseService {
     int limit = 20,
     int offset = 0,
   }) async {
-    var query = _client
+    var filter = _client
         .from('profiles')
         .select('''
           *,
@@ -113,19 +113,19 @@ class SupabaseService {
           )
         ''')
         .eq('is_active', true)
-        .neq('id', currentUserId ?? '')
-        .limit(limit)
-        .range(offset, offset + limit - 1);
+        .neq('id', currentUserId ?? '');
 
     if (minAge != null) {
-      query = query.gte('age', minAge);
+      filter = filter.filter('age', 'gte', minAge);
     }
     if (maxAge != null) {
-      query = query.lte('age', maxAge);
+      filter = filter.filter('age', 'lte', maxAge);
     }
     if (location != null && location.isNotEmpty) {
-      query = query.ilike('location', '%$location%');
+      filter = filter.ilike('location', '%$location%');
     }
+
+    final query = filter.limit(limit).range(offset, offset + limit - 1);
 
     final response = await query;
     return response.map((json) => UserProfile.fromJson(json)).toList();
@@ -287,7 +287,7 @@ class SupabaseService {
           schema: 'public',
           table: 'matches',
           filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.or,
+            type: PostgresChangeFilterType.inFilter,
             column: 'user1_id,user2_id',
             value: '$currentUserId,$currentUserId',
           ),
@@ -358,7 +358,7 @@ class SupabaseService {
 }
 
 // Additional model classes for the service
-class UserProfile extends User {
+class UserProfile extends UserModel {
   UserProfile({
     required super.id,
     super.email,

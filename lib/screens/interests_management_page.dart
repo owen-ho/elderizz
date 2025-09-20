@@ -30,7 +30,7 @@ class _InterestsManagementPageState extends State<InterestsManagementPage> {
       setState(() {
         allInterests = interests;
         // Cast to User to access interests
-        final userProfile = currentProfile as User?;
+        final userProfile = currentProfile as UserModel?;
         selectedInterestIds =
             userProfile?.interests.map((i) => i.id).toList() ?? [];
         isLoading = false;

@@ -113,7 +113,7 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 // User model matching database schema
-class User {
+class UserModel {
   final String id;
   final String? email;
   final String fullName;
@@ -135,7 +135,7 @@ class User {
   final DateTime lastActive;
   final List<Interest> interests;
 
-  User({
+  UserModel({
     required this.id,
     this.email,
     required this.fullName,
@@ -158,8 +158,8 @@ class User {
     this.interests = const [],
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
       id: json['id'] as String,
       email: json['email'] as String?,
       fullName: json['full_name'] as String,
@@ -316,10 +316,10 @@ class ChatMessage {
 // Data service - now uses Supabase for real data
 class DataService {
   // Keep sample data for development/fallback
-  static List<User> getSampleUsers() {
+  static List<UserModel> getSampleUsers() {
     final now = DateTime.now();
     return [
-      User(
+      UserModel(
         id: '1',
         fullName: 'Margaret Johnson',
         age: 68,
@@ -339,7 +339,7 @@ class DataService {
         updatedAt: now.subtract(const Duration(days: 1)),
         lastActive: now.subtract(const Duration(minutes: 5)),
       ),
-      User(
+      UserModel(
         id: '2',
         fullName: 'Robert Smith',
         age: 72,
@@ -359,7 +359,7 @@ class DataService {
         updatedAt: now.subtract(const Duration(days: 2)),
         lastActive: now.subtract(const Duration(hours: 3)),
       ),
-      User(
+      UserModel(
         id: '3',
         fullName: 'Dorothy Williams',
         age: 65,
@@ -379,7 +379,7 @@ class DataService {
         updatedAt: now.subtract(const Duration(hours: 6)),
         lastActive: now.subtract(const Duration(minutes: 15)),
       ),
-      User(
+      UserModel(
         id: '4',
         fullName: 'Frank Miller',
         age: 70,
@@ -402,12 +402,12 @@ class DataService {
     ];
   }
 
-  static Future<List<User>> getUsers() async {
+  static Future<List<UserModel>> getUsers() async {
     try {
       // Try to get users from Supabase
       final users = await SupabaseService.getDiscoverableUsers();
       if (users.isNotEmpty) {
-        return users.cast<User>();
+        return users.cast<UserModel>();
       }
     } catch (e) {
       print('Error fetching users from Supabase: $e');
@@ -475,7 +475,7 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  List<User> users = [];
+  List<UserModel> users = [];
   int currentIndex = 0;
   bool isLoading = true;
 
@@ -678,8 +678,8 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  List<User> users = [];
-  List<User> filteredUsers = [];
+  List<UserModel> users = [];
+  List<UserModel> filteredUsers = [];
   bool isLoading = true;
   String selectedAgeRange = 'All Ages';
   String selectedLocation = 'All Locations';
@@ -928,12 +928,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
       );
 
       // Apply interest filter locally (since it's more complex)
-      List<User> finalFilteredUsers = filteredUsersFromDb.cast<User>();
+      List<UserModel> finalFilteredUsers =
+          filteredUsersFromDb.cast<UserModel>();
       if (selectedInterest != 'All Interests') {
         finalFilteredUsers = filteredUsersFromDb
-            .where((user) => user.interest
+            .where((user) => user.interests
                 .any((interest) => interest.name == selectedInterest))
-            .cast<User>()
+            .cast<UserModel>()
             .toList();
       }
 
@@ -987,7 +988,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   List<ChatMessage> messages = [];
-  List<User> users = [];
+  List<UserModel> users = [];
   bool isLoading = true;
 
   @override
@@ -1096,7 +1097,7 @@ class _ChatPageState extends State<ChatPage> {
 
 // Chat Detail Page
 class ChatDetailPage extends StatefulWidget {
-  final User user;
+  final UserModel user;
 
   const ChatDetailPage({super.key, required this.user});
 
@@ -1357,7 +1358,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  User? currentUserProfile;
+  UserModel? currentUserProfile;
   bool isLoading = true;
 
   @override
@@ -1370,7 +1371,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final profile = await SupabaseService.getCurrentProfile();
       setState(() {
-        currentUserProfile = profile as User?;
+        currentUserProfile = profile as UserModel?;
         isLoading = false;
       });
     } catch (e) {
@@ -1592,7 +1593,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 // Edit Profile Page
 class EditProfilePage extends StatefulWidget {
-  final User? currentProfile;
+  final UserModel? currentProfile;
 
   const EditProfilePage({super.key, this.currentProfile});
 
@@ -1753,7 +1754,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
 // Other User Profile Page
 class OtherProfilePage extends StatelessWidget {
-  final User user;
+  final UserModel user;
 
   const OtherProfilePage({super.key, required this.user});
 
