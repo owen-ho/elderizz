@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'services/supabase_service.dart';
 import 'screens/auth_screen.dart';
+import 'screens/profile_completion_flow.dart';
+import 'models/profile_completion_models.dart';
 
 const appTheme = Color.fromRGBO(102, 51, 152, 1);
 MaterialColor getMaterialColor(Color color) {
@@ -246,6 +248,14 @@ class UserModel {
   final DateTime updatedAt;
   final DateTime lastActive;
   final List<Interest> interests;
+  // Profile completion fields
+  final DatingIntention? datingIntention;
+  final int? height;
+  final Ethnicity? ethnicity;
+  final ChildrenCount? childrenCount;
+  final Religion? religion;
+  final DrinkingHabit? drinkingHabit;
+  final SmokingHabit? smokingHabit;
 
   UserModel({
     required this.id,
@@ -268,6 +278,13 @@ class UserModel {
     required this.updatedAt,
     required this.lastActive,
     this.interests = const [],
+    this.datingIntention,
+    this.height,
+    this.ethnicity,
+    this.childrenCount,
+    this.religion,
+    this.drinkingHabit,
+    this.smokingHabit,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -517,6 +534,13 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 30)),
         updatedAt: now.subtract(const Duration(hours: 1)),
         lastActive: now.subtract(const Duration(minutes: 5)),
+        datingIntention: DatingIntention.longTerm,
+        height: 165,
+        ethnicity: Ethnicity.chinese,
+        childrenCount: ChildrenCount.twoToThree,
+        religion: Religion.christian,
+        drinkingHabit: DrinkingHabit.sometimes,
+        smokingHabit: SmokingHabit.no,
       ),
       UserModel(
         id: 'alex_id',
@@ -534,6 +558,13 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 45)),
         updatedAt: now.subtract(const Duration(days: 2)),
         lastActive: now.subtract(const Duration(hours: 3)),
+        datingIntention: DatingIntention.dontKnow,
+        height: 175,
+        ethnicity: Ethnicity.eurasian,
+        childrenCount: ChildrenCount.zeroToOne,
+        religion: Religion.atheist,
+        drinkingHabit: DrinkingHabit.yes,
+        smokingHabit: SmokingHabit.no,
       ),
       UserModel(
         id: 'emma_id',
@@ -551,6 +582,13 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 20)),
         updatedAt: now.subtract(const Duration(hours: 6)),
         lastActive: now.subtract(const Duration(minutes: 15)),
+        datingIntention: DatingIntention.shortTerm,
+        height: 160,
+        ethnicity: Ethnicity.african,
+        childrenCount: ChildrenCount.fourToFive,
+        religion: Religion.buddhist,
+        drinkingHabit: DrinkingHabit.no,
+        smokingHabit: SmokingHabit.no,
       ),
       UserModel(
         id: 'jessica_id',
@@ -568,6 +606,13 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 60)),
         updatedAt: now.subtract(const Duration(days: 3)),
         lastActive: now.subtract(const Duration(days: 1)),
+        datingIntention: DatingIntention.longTerm,
+        height: 162,
+        ethnicity: Ethnicity.indian,
+        childrenCount: ChildrenCount.sixPlus,
+        religion: Religion.hindu,
+        drinkingHabit: DrinkingHabit.sometimes,
+        smokingHabit: SmokingHabit.sometimes,
       ),
       UserModel(
         id: 'michael_id',
@@ -585,6 +630,13 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 25)),
         updatedAt: now.subtract(const Duration(hours: 4)),
         lastActive: now.subtract(const Duration(hours: 1)),
+        datingIntention: DatingIntention.longTerm,
+        height: 178,
+        ethnicity: Ethnicity.malay,
+        childrenCount: ChildrenCount.twoToThree,
+        religion: Religion.muslim,
+        drinkingHabit: DrinkingHabit.no,
+        smokingHabit: SmokingHabit.no,
       ),
     ];
   }
@@ -1093,382 +1145,483 @@ class _ExplorePageState extends State<ExplorePage> {
             ? const Center(child: CircularProgressIndicator())
             : filteredUsers.isEmpty
             ? const Center(child: Text('No profiles match your filters'))
-            : Column(
+            : Stack(
                 children: [
-                  // Header with app name
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'ELDERIZZ',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: appTheme,
-                            letterSpacing: 1.5,
-                          ),
+                  Column(
+                    children: [
+                      // Header with app name
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
                         ),
-                      ],
-                    ),
-                  ),
-                  // Filters section
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                        child: Row(
                           children: [
-                            // Age filter
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'AGE',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.grey.shade600,
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        value: selectedAgeRange,
-                                        isExpanded: true,
-                                        icon: Icon(
-                                          Icons.keyboard_arrow_down,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        onChanged: (String? newValue) {
-                                          if (newValue != null) {
-                                            setState(() {
-                                              selectedAgeRange = newValue;
-                                              _filterUsers();
-                                              currentIndex = 0;
-                                            });
-                                          }
-                                        },
-                                        items: ageRanges
-                                            .map<DropdownMenuItem<String>>((
-                                              String value,
-                                            ) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(
-                                                  value,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.grey.shade800,
-                                                  ),
-                                                ),
-                                              );
-                                            })
-                                            .toList(),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Region filter
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'REGION',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.grey.shade600,
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        value: selectedRegion,
-                                        isExpanded: true,
-                                        icon: Icon(
-                                          Icons.keyboard_arrow_down,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        onChanged: (String? newValue) {
-                                          if (newValue != null) {
-                                            setState(() {
-                                              selectedRegion = newValue;
-                                              _filterUsers();
-                                              currentIndex = 0;
-                                            });
-                                          }
-                                        },
-                                        items: regions
-                                            .map<DropdownMenuItem<String>>((
-                                              String value,
-                                            ) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(
-                                                  value,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.grey.shade800,
-                                                  ),
-                                                ),
-                                              );
-                                            })
-                                            .toList(),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            const Text(
+                              'ELDERIZZ',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: appTheme,
+                                letterSpacing: 1.5,
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Profile card
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Card(
-                        elevation: 8,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Stack(
-                            children: [
-                              // Background image
-                              Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                child:
-                                    filteredUsers[currentIndex].profileImage
-                                        .startsWith('http')
-                                    ? Image.network(
-                                        filteredUsers[currentIndex]
-                                            .profileImage,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        filteredUsers[currentIndex]
-                                            .profileImage,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-
-                              // Gradient overlay
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.7),
-                                    ],
-                                    stops: const [0.0, 0.5, 1.0],
-                                  ),
-                                ),
-                              ),
-
-                              // Profile info at bottom
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(24),
+                      ),
+                      // Filters section
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                // Age filter
+                                Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        '${filteredUsers[currentIndex].name}, ${filteredUsers[currentIndex].age}',
-                                        style: const TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                        'AGE',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey.shade600,
+                                          letterSpacing: 1,
                                         ),
                                       ),
                                       const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.location_on,
-                                            color: Colors.white70,
-                                            size: 18,
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
                                           ),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              filteredUsers[currentIndex]
-                                                  .location,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white70,
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selectedAgeRange,
+                                            isExpanded: true,
+                                            icon: Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            onChanged: (String? newValue) {
+                                              if (newValue != null) {
+                                                setState(() {
+                                                  selectedAgeRange = newValue;
+                                                  _filterUsers();
+                                                  currentIndex = 0;
+                                                });
+                                              }
+                                            },
+                                            items: ageRanges
+                                                .map<DropdownMenuItem<String>>((
+                                                  String value,
+                                                ) {
+                                                  return DropdownMenuItem<
+                                                    String
+                                                  >(
+                                                    value: value,
+                                                    child: Text(
+                                                      value,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade800,
+                                                      ),
+                                                    ),
+                                                  );
+                                                })
+                                                .toList(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Region filter
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'REGION',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey.shade600,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selectedRegion,
+                                            isExpanded: true,
+                                            icon: Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                            onChanged: (String? newValue) {
+                                              if (newValue != null) {
+                                                setState(() {
+                                                  selectedRegion = newValue;
+                                                  _filterUsers();
+                                                  currentIndex = 0;
+                                                });
+                                              }
+                                            },
+                                            items: regions
+                                                .map<DropdownMenuItem<String>>((
+                                                  String value,
+                                                ) {
+                                                  return DropdownMenuItem<
+                                                    String
+                                                  >(
+                                                    value: value,
+                                                    child: Text(
+                                                      value,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade800,
+                                                      ),
+                                                    ),
+                                                  );
+                                                })
+                                                .toList(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Profile card
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Container(
+                                  // elevation-like effect
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.shade300,
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Stack(
+                                        children: [
+                                          // Background image
+                                          ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                  topLeft: Radius.circular(16),
+                                                  topRight: Radius.circular(16),
+                                                ),
+                                            child: SizedBox(
+                                              width: double.infinity,
+                                              child:
+                                                  filteredUsers[currentIndex]
+                                                              .profileImageUrl !=
+                                                          null &&
+                                                      filteredUsers[currentIndex]
+                                                          .profileImageUrl!
+                                                          .startsWith('http')
+                                                  ? Image.network(
+                                                      filteredUsers[currentIndex]
+                                                          .profileImageUrl!,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.asset(
+                                                      filteredUsers[currentIndex]
+                                                              .profileImageUrl ??
+                                                          'assets/images/no_image.jpg',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                            ),
+                                          ),
+
+                                          // Gradient overlay
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                    Colors.transparent,
+                                                    Colors.transparent,
+                                                    Colors.black.withOpacity(
+                                                      0.7,
+                                                    ),
+                                                  ],
+                                                  stops: const [0.0, 0.5, 1.0],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                          // Profile info at bottom
+                                          Positioned(
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(24),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    '${filteredUsers[currentIndex].fullName}, ${filteredUsers[currentIndex].age}',
+                                                    style: const TextStyle(
+                                                      fontSize: 28,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.location_on,
+                                                        color: Colors.white70,
+                                                        size: 18,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Expanded(
+                                                        child: Text(
+                                                          filteredUsers[currentIndex]
+                                                              .location,
+                                                          style:
+                                                              const TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .white70,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        filteredUsers[currentIndex].bio ??
-                                            'No bio available',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
+                                      Padding(
+                                        padding: EdgeInsetsGeometry.symmetric(
+                                          horizontal: 16,
+                                          vertical: 5,
                                         ),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
+                                        child: Column(
+                                          children: [
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              filteredUsers[currentIndex].bio ??
+                                                  'No bio available',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            // Interest tags
+                                            if (filteredUsers[currentIndex]
+                                                .interests
+                                                .isNotEmpty)
+                                              Row(
+                                                children: [
+                                                  Wrap(
+                                                    spacing: 8,
+                                                    runSpacing: 4,
+                                                    children: filteredUsers[currentIndex]
+                                                        .interests
+                                                        .take(
+                                                          4,
+                                                        ) // Show max 4 interests
+                                                        .map((interest) {
+                                                          return Container(
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 6,
+                                                                ),
+                                                            decoration: BoxDecoration(
+                                                              color: appTheme
+                                                                  .withOpacity(
+                                                                    0.1,
+                                                                  ),
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    20,
+                                                                  ),
+                                                            ),
+                                                            child: Text(
+                                                              interest.name,
+                                                              style: const TextStyle(
+                                                                color: appTheme,
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        })
+                                                        .toList(),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        ),
                                       ),
-                                      const SizedBox(height: 16),
-                                      // Interest tags
+
+                                      // Profile completion info
                                       if (filteredUsers[currentIndex]
-                                          .interests
-                                          .isNotEmpty)
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 4,
-                                          children: filteredUsers[currentIndex]
-                                              .interests
-                                              .take(4) // Show max 4 interests
-                                              .map((interest) {
-                                                return Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: appTheme.withOpacity(
-                                                      0.8,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
-                                                        ),
-                                                  ),
-                                                  child: Text(
-                                                    interest.name,
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                );
-                                              })
-                                              .toList(),
+                                                  .datingIntention !=
+                                              null ||
+                                          filteredUsers[currentIndex].height !=
+                                              null ||
+                                          filteredUsers[currentIndex]
+                                                  .ethnicity !=
+                                              null)
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                            10,
+                                            0,
+                                            10,
+                                            16,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const SizedBox(height: 16),
+                                              _buildProfileCompletionSection(
+                                                filteredUsers[currentIndex],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 110),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-
                   // Action buttons
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Pass button
-                        Container(
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.shade300,
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              _nextProfile();
-                            },
-                            icon: const Icon(
-                              Icons.close,
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Pass button
+                          Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
                               color: Colors.red,
-                              size: 30,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.shade300,
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-
-                        // Like button
-                        Container(
-                          height: 60,
-                          width: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.shade300,
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
+                            child: IconButton(
+                              onPressed: () {
+                                _nextProfile();
+                              },
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 30,
                               ),
-                            ],
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              _likeProfile();
-                            },
-                            icon: const Icon(
-                              Icons.favorite,
-                              color: Colors.green,
-                              size: 30,
                             ),
                           ),
-                        ),
-                      ],
+
+                          // Like button
+                          Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.green,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.shade300,
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                _likeProfile();
+                              },
+                              icon: const Icon(
+                                Icons.favorite_outline,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -1496,7 +1649,7 @@ class _ExplorePageState extends State<ExplorePage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('You liked ${currentUser.name}!'),
+          content: Text('You liked ${currentUser.fullName}!'),
           backgroundColor: Colors.green,
         ),
       );
@@ -1516,6 +1669,122 @@ class _ExplorePageState extends State<ExplorePage> {
     }
 
     _nextProfile();
+  }
+
+  Widget _buildProfileCompletionSection(UserModel user) {
+    final profileInfo = <Map<String, String>>[];
+
+    if (user.datingIntention != null) {
+      profileInfo.add({
+        'icon': '💕',
+        'label': 'Looking for',
+        'value': user.datingIntention!.displayName,
+      });
+    }
+
+    if (user.height != null) {
+      profileInfo.add({
+        'icon': '📏',
+        'label': 'Height',
+        'value': '${user.height} cm',
+      });
+    }
+
+    if (user.ethnicity != null) {
+      profileInfo.add({
+        'icon': '🌍',
+        'label': 'Ethnicity',
+        'value': user.ethnicity!.displayName,
+      });
+    }
+
+    if (user.childrenCount != null) {
+      profileInfo.add({
+        'icon': '👶',
+        'label': 'Children',
+        'value': user.childrenCount!.displayName,
+      });
+    }
+
+    if (user.religion != null) {
+      profileInfo.add({
+        'icon': '🙏',
+        'label': 'Religion',
+        'value': user.religion!.displayName,
+      });
+    }
+
+    if (user.drinkingHabit != null) {
+      profileInfo.add({
+        'icon': '🍷',
+        'label': 'Drinks',
+        'value': user.drinkingHabit!.displayName,
+      });
+    }
+
+    if (user.smokingHabit != null) {
+      profileInfo.add({
+        'icon': '🚭',
+        'label': 'Smokes',
+        'value': user.smokingHabit!.displayName,
+      });
+    }
+
+    if (profileInfo.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'About Me',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...profileInfo
+              .take(4)
+              .map(
+                (info) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Text(info['icon']!, style: const TextStyle(fontSize: 16)),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${info['label']}: ',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          info['value']!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+        ],
+      ),
+    );
   }
 }
 
@@ -3004,6 +3273,31 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           child: const Text(
                             'Edit Profile',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ProfileCompletionFlow(),
+                              ),
+                            ).then(
+                              (_) => _loadCurrentProfile(),
+                            ); // Reload profile after completion
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Complete Your Profile',
                             style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                         ),

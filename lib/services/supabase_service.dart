@@ -101,6 +101,47 @@ class SupabaseService {
     await _client.from('profiles').update(updates).eq('id', currentUserId!);
   }
 
+  // Profile Completion
+  static Future<void> saveProfileCompletion(
+    Map<String, dynamic> completionData,
+  ) async {
+    if (currentUserId == null) return;
+
+    // Calculate completion percentage
+    final requiredFields = [
+      'gender',
+      'dating_intention',
+      'height',
+      'ethnicity',
+      'children_count',
+      'religion',
+      'drinking_habit',
+      'smoking_habit',
+    ];
+
+    int completedFields = 0;
+    for (String field in requiredFields) {
+      if (completionData[field] != null) {
+        completedFields++;
+      }
+    }
+
+    final completionPercentage =
+        ((completedFields / requiredFields.length) * 100).round();
+
+    // Add completion percentage to the data
+    final dataWithPercentage = {
+      ...completionData,
+      'profile_completion_percentage': completionPercentage,
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+
+    await _client
+        .from('profiles')
+        .update(dataWithPercentage)
+        .eq('id', currentUserId!);
+  }
+
   // Profile Image Management
   static Future<String> uploadProfileImage(String filePath) async {
     if (currentUserId == null) throw Exception('User not authenticated');

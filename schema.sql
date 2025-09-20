@@ -26,6 +26,15 @@ CREATE TABLE profiles (
     max_distance_km INTEGER DEFAULT 50,
     age_range_min INTEGER DEFAULT 18,
     age_range_max INTEGER DEFAULT 100,
+    -- Profile completion fields
+    dating_intention TEXT CHECK (dating_intention IN ('longTerm', 'shortTerm', 'dontKnow')),
+    height INTEGER, -- height in cm
+    ethnicity TEXT CHECK (ethnicity IN ('chinese', 'indian', 'malay', 'eurasian', 'african')),
+    children_count TEXT CHECK (children_count IN ('zeroToOne', 'twoToThree', 'fourToFive', 'sixPlus')),
+    religion TEXT CHECK (religion IN ('buddhist', 'christian', 'muslim', 'hindu', 'atheist', 'agnostic', 'jewish')),
+    drinking_habit TEXT CHECK (drinking_habit IN ('yes', 'sometimes', 'no')),
+    smoking_habit TEXT CHECK (smoking_habit IN ('yes', 'sometimes', 'no')),
+    profile_completion_percentage INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     last_active TIMESTAMP WITH TIME ZONE DEFAULT NOW()
