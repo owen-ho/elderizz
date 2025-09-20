@@ -985,25 +985,40 @@ class _ExplorePageState extends State<ExplorePage> {
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        FloatingActionButton(
-                          onPressed: () {
-                            _nextProfile();
-                          },
-                          backgroundColor: Colors.red,
-                          heroTag: "pass",
-                          child: const Icon(Icons.close, color: Colors.white),
+                        SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: FloatingActionButton(
+                            shape: CircleBorder(),
+                            onPressed: () {
+                              _nextProfile();
+                            },
+                            backgroundColor: Colors.red,
+                            heroTag: "pass",
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 50,
+                            ),
+                          ),
                         ),
-                        FloatingActionButton(
-                          onPressed: () {
-                            _likeProfile();
-                          },
-                          backgroundColor: Colors.green,
-                          heroTag: "like",
-                          child: const Icon(
-                            Icons.favorite,
-                            color: Colors.white,
+                        SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: FloatingActionButton(
+                            shape: CircleBorder(),
+                            onPressed: () {
+                              _likeProfile();
+                            },
+                            backgroundColor: Colors.green,
+                            heroTag: "like",
+                            child: const Icon(
+                              Icons.favorite_outline,
+                              color: Colors.white,
+                              size: 50,
+                            ),
                           ),
                         ),
                       ],
