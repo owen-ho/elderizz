@@ -804,6 +804,159 @@ Jazz & Wine Evening
     // Fallback to sample data
     return getSampleMessages();
   }
+
+  // Sample data for people who liked the current user
+  static List<UserModel> getSampleUsersWhoLikedMe() {
+    final now = DateTime.now();
+    return [
+      UserModel(
+        id: 'liker_1',
+        fullName: 'Jessica',
+        age: 24,
+        location: '1 mile away',
+        bio: 'Love hiking, reading, and good coffee.',
+        profileImageUrl: 'assets/images/pp3.jpg',
+        status: 'online',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 10)),
+        updatedAt: now.subtract(const Duration(hours: 2)),
+        lastActive: now.subtract(const Duration(hours: 1)),
+        interests: [
+          Interest(id: '1', name: 'Hiking', icon: '🥾', createdAt: now),
+          Interest(id: '2', name: 'Reading', icon: '📚', createdAt: now),
+        ],
+      ),
+      UserModel(
+        id: 'liker_2',
+        fullName: 'Michael',
+        age: 29,
+        location: '4 miles away',
+        bio: 'Software engineer who loves cooking and traveling.',
+        profileImageUrl: 'assets/images/mpp3.jpg',
+        status: 'online',
+        gender: 'male',
+        createdAt: now.subtract(const Duration(days: 15)),
+        updatedAt: now.subtract(const Duration(hours: 6)),
+        lastActive: now.subtract(const Duration(hours: 2)),
+        interests: [
+          Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
+          Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
+        ],
+      ),
+      UserModel(
+        id: 'liker_3',
+        fullName: 'Lisa',
+        age: 27,
+        location: '2 miles away',
+        bio: 'Artist and dog lover. Looking for genuine connections.',
+        profileImageUrl: 'assets/images/pp4.jpg',
+        status: 'offline',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 5)),
+        updatedAt: now.subtract(const Duration(hours: 12)),
+        lastActive: now.subtract(const Duration(hours: 8)),
+        interests: [
+          Interest(id: '5', name: 'Art', icon: '🎨', createdAt: now),
+          Interest(id: '6', name: 'Dogs', icon: '🐕', createdAt: now),
+        ],
+      ),
+      UserModel(
+        id: 'liker_4',
+        fullName: 'David',
+        age: 31,
+        location: '3 miles away',
+        bio: 'Photographer and music enthusiast.',
+        profileImageUrl: 'assets/images/mpp4.jpg',
+        status: 'online',
+        gender: 'male',
+        createdAt: now.subtract(const Duration(days: 8)),
+        updatedAt: now.subtract(const Duration(hours: 4)),
+        lastActive: now.subtract(const Duration(minutes: 30)),
+        interests: [
+          Interest(id: '7', name: 'Photography', icon: '📷', createdAt: now),
+          Interest(id: '8', name: 'Music', icon: '🎵', createdAt: now),
+        ],
+      ),
+    ];
+  }
+
+  // Sample data for people the current user has liked
+  static List<UserModel> getSampleUsersILiked() {
+    final now = DateTime.now();
+    return [
+      UserModel(
+        id: 'liked_1',
+        fullName: 'Emily',
+        age: 26,
+        location: '2 miles away',
+        bio: 'Nature lover and yoga instructor.',
+        profileImageUrl: 'assets/images/pp5.jpg',
+        status: 'online',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 12)),
+        updatedAt: now.subtract(const Duration(hours: 3)),
+        lastActive: now.subtract(const Duration(minutes: 45)),
+        interests: [
+          Interest(id: '9', name: 'Yoga', icon: '🧘‍♀️', createdAt: now),
+          Interest(id: '10', name: 'Nature', icon: '🌿', createdAt: now),
+        ],
+      ),
+      UserModel(
+        id: 'liked_2',
+        fullName: 'James',
+        age: 32,
+        location: '5 miles away',
+        bio: 'Chef and wine enthusiast.',
+        profileImageUrl: 'assets/images/mpp5.jpg',
+        status: 'offline',
+        gender: 'male',
+        createdAt: now.subtract(const Duration(days: 20)),
+        updatedAt: now.subtract(const Duration(hours: 8)),
+        lastActive: now.subtract(const Duration(hours: 6)),
+        interests: [
+          Interest(id: '11', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
+          Interest(id: '12', name: 'Wine', icon: '🍷', createdAt: now),
+        ],
+      ),
+      UserModel(
+        id: 'liked_3',
+        fullName: 'Sarah',
+        age: 28,
+        location: '1 mile away',
+        bio: 'Writer and bookworm.',
+        profileImageUrl: 'assets/images/pp6.jpg',
+        status: 'online',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 7)),
+        updatedAt: now.subtract(const Duration(hours: 1)),
+        lastActive: now.subtract(const Duration(minutes: 10)),
+        interests: [
+          Interest(id: '13', name: 'Writing', icon: '✍️', createdAt: now),
+          Interest(id: '14', name: 'Reading', icon: '📚', createdAt: now),
+        ],
+      ),
+    ];
+  }
+
+  static Future<List<UserModel>> getUsersWhoLikedMe() async {
+    try {
+      // In a real app, you would fetch from Supabase here
+      return getSampleUsersWhoLikedMe();
+    } catch (e) {
+      print('Error fetching users who liked me: $e');
+      return getSampleUsersWhoLikedMe();
+    }
+  }
+
+  static Future<List<UserModel>> getUsersILiked() async {
+    try {
+      // In a real app, you would fetch from Supabase here
+      return getSampleUsersILiked();
+    } catch (e) {
+      print('Error fetching users I liked: $e');
+      return getSampleUsersILiked();
+    }
+  }
 }
 
 // Explore Page
@@ -1661,6 +1814,16 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LikesPage()),
+            );
+          },
+          backgroundColor: appTheme,
+          child: const Icon(Icons.favorite, color: Colors.white),
+        ),
       ),
     );
   }
@@ -1676,6 +1839,364 @@ class _ChatPageState extends State<ChatPage> {
     } else {
       return '${difference.inMinutes}m ago';
     }
+  }
+}
+
+// Likes Page
+class LikesPage extends StatefulWidget {
+  const LikesPage({super.key});
+
+  @override
+  State<LikesPage> createState() => _LikesPageState();
+}
+
+class _LikesPageState extends State<LikesPage> {
+  bool showWhoLikedMe = true; // true = who liked me, false = who I liked
+  List<UserModel> usersWhoLikedMe = [];
+  List<UserModel> usersILiked = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final likedMe = await DataService.getUsersWhoLikedMe();
+      final iLiked = await DataService.getUsersILiked();
+      setState(() {
+        usersWhoLikedMe = likedMe;
+        usersILiked = iLiked;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading likes data: $e');
+      setState(() {
+        usersWhoLikedMe = DataService.getSampleUsersWhoLikedMe();
+        usersILiked = DataService.getSampleUsersILiked();
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentList = showWhoLikedMe ? usersWhoLikedMe : usersILiked;
+
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header section
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const BackButton(),
+                      const Text(
+                        'ELDERIZZ',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    showWhoLikedMe
+                        ? 'People who liked you'
+                        : 'People you liked',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${currentList.length} ${showWhoLikedMe ? 'potential matches' : 'profiles liked'}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                  ),
+                ],
+              ),
+            ),
+
+            // Toggle switch
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showWhoLikedMe = true;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: showWhoLikedMe
+                                ? appTheme
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Text(
+                            'Liked You',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: showWhoLikedMe
+                                  ? Colors.white
+                                  : Colors.grey.shade600,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showWhoLikedMe = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: !showWhoLikedMe
+                                ? appTheme
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Text(
+                            'You Liked',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: !showWhoLikedMe
+                                  ? Colors.white
+                                  : Colors.grey.shade600,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // List of users
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : currentList.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.favorite_border,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            showWhoLikedMe
+                                ? 'No one has liked you yet\nKeep exploring to get matches!'
+                                : 'You haven\'t liked anyone yet\nStart exploring to find people you like!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(20),
+                      itemCount: currentList.length,
+                      itemBuilder: (context, index) {
+                        final user = currentList[index];
+                        return _buildUserCard(user);
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserCard(UserModel user) {
+    // Calculate mutual friends (mock data for demo)
+    final mutualFriends = (user.age % 3) + 1; // Simple mock calculation
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            // Profile image with heart icon
+            Stack(
+              children: [
+                ProfileImageWidget(
+                  imageUrl: user.profileImageUrl,
+                  size: 60,
+                  isCircular: true,
+                ),
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      color: appTheme,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.favorite,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(width: 16),
+
+            // User info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${user.name}, ${user.age}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user.location,
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$mutualFriends mutual friend${mutualFriends > 1 ? 's' : ''}',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
+                ],
+              ),
+            ),
+
+            // Action buttons
+            Column(
+              children: [
+                // View Profile button
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OtherProfilePage(user: user),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: appTheme),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                  child: Text(
+                    'View Profile',
+                    style: TextStyle(
+                      color: appTheme,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Message button
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatDetailPage(user: user),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: appTheme,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.message, size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        'Message',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
