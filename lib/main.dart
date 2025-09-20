@@ -106,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const ExplorePage(),
-    const DiscoverPage(),
+    const EventsPage(),
     const ChatPage(),
     const ProfilePage(),
   ];
@@ -127,12 +127,100 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Discover'),
+          BottomNavigationBarItem(icon: Icon(Icons.event), label: 'Events'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
+  }
+}
+
+// Event model for the events page
+class EventModel {
+  final String id;
+  final String title;
+  final String location;
+  final DateTime dateTime;
+  final String category;
+  final String? imageUrl;
+  final String description;
+  final int participantCount;
+  final int maxParticipants;
+  final String organizerId;
+  final bool isJoined;
+  final DateTime createdAt;
+
+  EventModel({
+    required this.id,
+    required this.title,
+    required this.location,
+    required this.dateTime,
+    required this.category,
+    this.imageUrl,
+    required this.description,
+    required this.participantCount,
+    required this.maxParticipants,
+    required this.organizerId,
+    this.isJoined = false,
+    required this.createdAt,
+  });
+
+  factory EventModel.fromJson(Map<String, dynamic> json) {
+    return EventModel(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      location: json['location'] as String,
+      dateTime: DateTime.parse(json['date_time']),
+      category: json['category'] as String,
+      imageUrl: json['image_url'] as String?,
+      description: json['description'] as String,
+      participantCount: json['participant_count'] as int,
+      maxParticipants: json['max_participants'] as int,
+      organizerId: json['organizer_id'] as String,
+      isJoined: json['is_joined'] as bool? ?? false,
+      createdAt: DateTime.parse(json['created_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'location': location,
+      'date_time': dateTime.toIso8601String(),
+      'category': category,
+      'image_url': imageUrl,
+      'description': description,
+      'participant_count': participantCount,
+      'max_participants': maxParticipants,
+      'organizer_id': organizerId,
+      'is_joined': isJoined,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+
+  String get formattedDate {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+    if (eventDate == today) {
+      return 'Today';
+    } else if (eventDate == today.add(const Duration(days: 1))) {
+      return 'Tomorrow';
+    } else {
+      final days = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ];
+      return days[dateTime.weekday - 1];
+    }
   }
 }
 
@@ -512,6 +600,170 @@ class DataService {
     return getSampleUsers();
   }
 
+  static List<EventModel> getSampleEvents() {
+    final now = DateTime.now();
+    final a = [
+      EventModel(
+        id: '1',
+        title: 'Weekend Hiking at Blue Ridge',
+        location: 'Blue Ridge Mountains',
+        dateTime: now.add(const Duration(days: 2)),
+        category: 'Outdoor',
+        imageUrl: 'assets/images/hiking.jpg',
+        description:
+            'Join us for a scenic hike through the beautiful Blue Ridge Mountains. Moderate difficulty level suitable for active seniors.',
+        participantCount: 12,
+        maxParticipants: 20,
+        organizerId: 'org_1',
+        createdAt: now.subtract(const Duration(days: 5)),
+      ),
+      EventModel(
+        id: '2',
+        title: 'Mahjong Tournament',
+        location: 'Community Center',
+        dateTime: now.add(const Duration(days: 1)),
+        category: 'Mahjong',
+        imageUrl: 'assets/images/mahjong.jpg',
+        description:
+            'Weekly mahjong tournament for players of all skill levels. Prizes for winners and tea service provided.',
+        participantCount: 16,
+        maxParticipants: 20,
+        organizerId: 'org_2',
+        createdAt: now.subtract(const Duration(days: 3)),
+      ),
+      EventModel(
+        id: '3',
+        title: 'Garden Club Planting Session',
+        location: 'Sunset Gardens',
+        dateTime: now.add(const Duration(days: 3)),
+        category: 'Gardening',
+        imageUrl: 'assets/images/gardening.jpg',
+        description:
+            'Come and help us plant the spring vegetable garden. Learn new techniques and make new friends!',
+        participantCount: 8,
+        maxParticipants: 15,
+        organizerId: 'org_3',
+        createdAt: now.subtract(const Duration(days: 7)),
+      ),
+      EventModel(
+        id: '4',
+        title: 'Morning Tai Chi in the Park',
+        location: 'Central Park',
+        dateTime: now.add(const Duration(hours: 18)),
+        category: 'Tai Chi',
+        imageUrl: 'assets/images/taichi.jpg',
+        description:
+            'Gentle morning Tai Chi practice suitable for all levels. Improve balance, flexibility and meet fellow practitioners.',
+        participantCount: 24,
+        maxParticipants: 30,
+        organizerId: 'org_4',
+        createdAt: now.subtract(const Duration(days: 2)),
+      ),
+      EventModel(
+        id: '5',
+        title: 'Classic Literature Book Club',
+        location: 'Public Library',
+        dateTime: now.add(const Duration(days: 5)),
+        category: 'Book Club',
+        imageUrl: 'assets/images/bookclub.jpg',
+        description:
+            'This month we\'re discussing "To Kill a Mockingbird". New members welcome! Light refreshments provided.',
+        participantCount: 10,
+        maxParticipants: 12,
+        organizerId: 'org_5',
+        createdAt: now.subtract(const Duration(days: 10)),
+      ),
+      EventModel(
+        id: '6',
+        title: 'Cooking Class: Traditional Recipes',
+        location: 'Culinary Arts Center',
+        dateTime: now.add(const Duration(days: 4)),
+        category: 'Cooking',
+        imageUrl: 'assets/images/cooking.jpg',
+        description:
+            'Learn to make traditional family recipes passed down through generations. All ingredients provided.',
+        participantCount: 6,
+        maxParticipants: 12,
+        organizerId: 'org_6',
+        createdAt: now.subtract(const Duration(days: 6)),
+      ),
+      EventModel(
+        id: '7',
+        title: 'Bridge Tournament Finals',
+        location: 'Senior Center',
+        dateTime: now.add(const Duration(days: 6)),
+        category: 'Bridge',
+        imageUrl: 'assets/images/bridge.jpg',
+        description:
+            'Final round of our monthly bridge tournament. Spectators welcome! Cash prizes for top 3 teams.',
+        participantCount: 32,
+        maxParticipants: 40,
+        organizerId: 'org_7',
+        createdAt: now.subtract(const Duration(days: 15)),
+      ),
+      EventModel(
+        id: '8',
+        title: 'Photography Walk: Fall Colors',
+        location: 'Botanical Gardens',
+        dateTime: now.add(const Duration(days: 7)),
+        category: 'Photography',
+        imageUrl: 'assets/images/photography.jpg',
+        description:
+            'Capture the beautiful fall foliage with fellow photography enthusiasts. All skill levels welcome.',
+        participantCount: 14,
+        maxParticipants: 20,
+        organizerId: 'org_8',
+        createdAt: now.subtract(const Duration(days: 8)),
+      ),
+      EventModel(
+        id: '9',
+        title: 'Art & Craft Workshop',
+        location: 'Community Art Center',
+        dateTime: now.add(const Duration(days: 9)),
+        category: 'Arts & Crafts',
+        imageUrl: 'assets/images/arts.jpg',
+        description:
+            'Create beautiful handmade crafts and artwork. All materials provided. Take home your creations!',
+        participantCount: 9,
+        maxParticipants: 15,
+        organizerId: 'org_9',
+        createdAt: now.subtract(const Duration(days: 4)),
+      ),
+      EventModel(
+        id: '10',
+        title: 'Jazz & Wine Evening',
+        location: 'Harbor Lounge',
+        dateTime: now.add(const Duration(days: 8)),
+        category: 'Music & Entertainment',
+        imageUrl: 'assets/images/jazz.jpg',
+        description:
+            'Enjoy live jazz music with wine tasting. A sophisticated evening for music lovers.',
+        participantCount: 22,
+        maxParticipants: 50,
+        organizerId: 'org_10',
+        createdAt: now.subtract(const Duration(days: 12)),
+      ),
+    ];
+    print(a.map((e) => e.title).toList());
+    return a;
+  }
+
+  static Future<List<EventModel>> getEvents({String? category}) async {
+    try {
+      // In a real app, you would fetch from Supabase here
+      final events = getSampleEvents();
+
+      if (category != null && category != 'All') {
+        return events.where((event) => event.category == category).toList();
+      }
+
+      return events;
+    } catch (e) {
+      print('Error fetching events: $e');
+      return getSampleEvents();
+    }
+  }
+
   static List<ChatMessage> getSampleMessages() {
     final now = DateTime.now();
     return [
@@ -797,181 +1049,56 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 }
 
-// Discover Page
-class DiscoverPage extends StatefulWidget {
-  const DiscoverPage({super.key});
+// Events Page
+class EventsPage extends StatefulWidget {
+  const EventsPage({super.key});
 
   @override
-  State<DiscoverPage> createState() => _DiscoverPageState();
+  State<EventsPage> createState() => _EventsPageState();
 }
 
-class _DiscoverPageState extends State<DiscoverPage> {
-  List<UserModel> users = [];
-  List<UserModel> filteredUsers = [];
+class _EventsPageState extends State<EventsPage> {
+  List<EventModel> events = [];
+  List<EventModel> filteredEvents = [];
   bool isLoading = true;
-  String selectedAgeRange = 'All Ages';
-  String selectedLocation = 'All Locations';
-  String selectedInterest = 'All Interests';
+  String selectedCategory = 'All';
 
-  final List<String> ageRanges = ['All Ages', '60-65', '66-70', '71-75', '76+'];
-  final List<String> locations = [
-    'All Locations',
-    'New York, NY',
-    'Los Angeles, CA',
-    'Chicago, IL',
-    'Miami, FL',
-  ];
-  final List<String> interests = [
-    'All Interests',
-    'Gardening',
-    'Reading',
-    'Photography',
-    'Cooking',
-    'Travel',
-  ];
+  final Map<String, String> eventCategories = {
+    'All': '🌟',
+    'Outdoor': '🏞️',
+    'Mahjong': '🀄',
+    'Gardening': '🌱',
+    'Tai Chi': '🧘‍♀️',
+    'Book Club': '📚',
+    'Cooking': '👨‍🍳',
+    'Bridge': '🃏',
+    'Photography': '📷',
+    'Arts & Crafts': '🎨',
+    'Music & Entertainment': '🎵',
+  };
 
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    _loadEvents();
   }
 
-  Future<void> _loadUsers() async {
+  Future<void> _loadEvents() async {
     try {
-      final loadedUsers = await DataService.getUsers();
+      final loadedEvents = await DataService.getEvents();
       setState(() {
-        users = loadedUsers;
-        filteredUsers = loadedUsers;
+        events = loadedEvents;
+        filteredEvents = loadedEvents;
         isLoading = false;
       });
     } catch (e) {
-      print('Error loading users: $e');
+      print('Error loading events: $e');
       setState(() {
-        users = DataService.getSampleUsers();
-        filteredUsers = DataService.getSampleUsers();
+        events = DataService.getSampleEvents();
+        filteredEvents = DataService.getSampleEvents();
         isLoading = false;
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Discover'),
-        backgroundColor: appTheme,
-        foregroundColor: Colors.white,
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                // Filters by interest in the form of pill buttons which can be active/inactive, updating the listview accordingly
-                // Interest filter pills
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    children: interests.map((interest) {
-                      final isSelected = selectedInterest == interest;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(interest),
-                          selected: isSelected,
-                          selectedColor: appTheme,
-                          backgroundColor: getMaterialColor(appTheme).shade50,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : appTheme,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onSelected: (selected) {
-                            setState(() {
-                              selectedInterest = interest;
-                            });
-                            _applyFilters();
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = filteredUsers[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          leading: ProfileImageWidget(
-                            imageUrl: user.profileImageUrl,
-                            size: 60,
-                          ),
-                          title: Text('${user.name}, ${user.age}'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    size: 16,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(user.location),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                user.bio ?? 'No bio available',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: user.status == 'online'
-                                      ? Colors.green
-                                      : Colors.grey,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward_ios),
-                            ],
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    OtherProfilePage(user: user),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-    );
   }
 
   void _applyFilters() async {
@@ -980,72 +1107,22 @@ class _DiscoverPageState extends State<DiscoverPage> {
     });
 
     try {
-      // Determine age range
-      int? minAge, maxAge;
-      switch (selectedAgeRange) {
-        case '60-65':
-          minAge = 60;
-          maxAge = 65;
-          break;
-        case '66-70':
-          minAge = 66;
-          maxAge = 70;
-          break;
-        case '71-75':
-          minAge = 71;
-          maxAge = 75;
-          break;
-        case '76+':
-          minAge = 76;
-          break;
-      }
-
-      // Determine location filter
-      String? locationFilter = selectedLocation == 'All Locations'
-          ? null
-          : selectedLocation;
-
-      // Get filtered users from Supabase
-      final filteredUsersFromDb = await SupabaseService.getDiscoverableUsers(
-        minAge: minAge,
-        maxAge: maxAge,
-        location: locationFilter,
+      final filteredEventsFromDb = await DataService.getEvents(
+        category: selectedCategory == 'All' ? null : selectedCategory,
       );
 
-      // Apply interest filter locally (since it's more complex)
-      List<UserModel> finalFilteredUsers = filteredUsersFromDb
-          .cast<UserModel>();
-      if (selectedInterest != 'All Interests') {
-        finalFilteredUsers = filteredUsersFromDb
-            .where(
-              (user) => user.interests.any(
-                (interest) => interest.name == selectedInterest,
-              ),
-            )
-            .cast<UserModel>()
-            .toList();
-      }
-
       setState(() {
-        filteredUsers = finalFilteredUsers;
+        filteredEvents = filteredEventsFromDb;
         isLoading = false;
       });
     } catch (e) {
       print('Error applying filters: $e');
       // Fallback to local filtering
-      filteredUsers = users.where((user) {
-        bool ageMatch =
-            selectedAgeRange == 'All Ages' ||
-            _isAgeInRange(user.age, selectedAgeRange);
-        bool locationMatch =
-            selectedLocation == 'All Locations' ||
-            user.location == selectedLocation;
-        bool interestMatch =
-            selectedInterest == 'All Interests' ||
-            user.interests.any((interest) => interest.name == selectedInterest);
-
-        return ageMatch && locationMatch && interestMatch;
-      }).toList();
+      filteredEvents = selectedCategory == 'All'
+          ? events
+          : events
+                .where((event) => event.category == selectedCategory)
+                .toList();
 
       setState(() {
         isLoading = false;
@@ -1053,18 +1130,404 @@ class _DiscoverPageState extends State<DiscoverPage> {
     }
   }
 
-  bool _isAgeInRange(int age, String range) {
-    switch (range) {
-      case '60-65':
-        return age >= 60 && age <= 65;
-      case '66-70':
-        return age >= 66 && age <= 70;
-      case '71-75':
-        return age >= 71 && age <= 75;
-      case '76+':
-        return age >= 76;
-      default:
-        return true;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      body: SafeArea(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'ELDERIZZ',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: appTheme,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Hi, owen!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const Text(
+                          'Discover activities and meet like-minded people',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Category filter chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: eventCategories.entries.map((entry) {
+                        final isSelected = selectedCategory == entry.key;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedCategory = entry.key;
+                              });
+                              _applyFilters();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected ? appTheme : Colors.white,
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? appTheme
+                                      : Colors.grey.shade300,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    entry.value,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    entry.key,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.black87,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Popular Activities section
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Popular Activities Near You',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Events list
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: filteredEvents.length,
+                      itemBuilder: (context, index) {
+                        final event = filteredEvents[index];
+                        return _buildEventCard(event);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildEventCard(EventModel event) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Event image
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              image: DecorationImage(
+                image: AssetImage(
+                  event.imageUrl ?? 'assets/images/no_image.jpg',
+                ),
+                fit: BoxFit.cover,
+                onError: (error, stackTrace) {},
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.3)],
+                ),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Event title
+                Text(
+                  event.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Location
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        event.location,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // Participant info and date
+                Row(
+                  children: [
+                    // Participants
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.people,
+                          size: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${event.participantCount}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(),
+
+                    // Date
+                    Text(
+                      event.formattedDate,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // View participants and Join button
+                Row(
+                  children: [
+                    // View participants button
+                    TextButton(
+                      onPressed: () {
+                        _showParticipantsDialog(event);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.people_outline, size: 16, color: appTheme),
+                          const SizedBox(width: 4),
+                          Text(
+                            'View participants',
+                            style: TextStyle(
+                              color: appTheme,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            size: 16,
+                            color: appTheme,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Join button
+                    ElevatedButton(
+                      onPressed: () => _joinEvent(event),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: appTheme,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        event.isJoined ? 'Joined' : 'Join',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showParticipantsDialog(EventModel event) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('${event.title} Participants'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${event.participantCount} people have joined this event'),
+              const SizedBox(height: 16),
+              Text('Max participants: ${event.maxParticipants}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _joinEvent(EventModel event) async {
+    try {
+      // In a real app, you would call a service to join the event
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            event.isJoined
+                ? 'You have left ${event.title}'
+                : 'Successfully joined ${event.title}!',
+          ),
+          backgroundColor: appTheme,
+        ),
+      );
+
+      // Update local state (in real app, this would be handled by the backend)
+      setState(() {
+        final index = filteredEvents.indexWhere((e) => e.id == event.id);
+        if (index != -1) {
+          filteredEvents[index] = EventModel(
+            id: event.id,
+            title: event.title,
+            location: event.location,
+            dateTime: event.dateTime,
+            category: event.category,
+            imageUrl: event.imageUrl,
+            description: event.description,
+            participantCount: event.isJoined
+                ? event.participantCount - 1
+                : event.participantCount + 1,
+            maxParticipants: event.maxParticipants,
+            organizerId: event.organizerId,
+            isJoined: !event.isJoined,
+            createdAt: event.createdAt,
+          );
+        }
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error joining event. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }
