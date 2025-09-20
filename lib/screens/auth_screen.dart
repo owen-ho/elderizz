@@ -138,6 +138,35 @@ class _SignInFormState extends State<SignInForm> {
     });
   }
 
+  Future<void> _signInWithSingpass() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await SupabaseService.signIn(
+        email: 'hoshangluen@gmail.com',
+        password: 'password1!',
+      );
+
+      if (response.user != null) {
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const ElderlyDatingApp()),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Singpass sign in failed: ${e.toString()}')),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -181,6 +210,18 @@ class _SignInFormState extends State<SignInForm> {
                     'Sign In',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: GestureDetector(
+            onTap: _isLoading ? null : _signInWithSingpass,
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
+                : Image.asset('assets/images/singpass.png'),
           ),
         ),
       ],
