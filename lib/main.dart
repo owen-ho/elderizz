@@ -2111,10 +2111,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        const EditProfilePage(),
+                                    builder: (context) => EditProfilePage(
+                                      currentProfile: currentUserProfile,
+                                    ),
                                   ),
-                                );
+                                ).then(
+                                  (_) => _loadCurrentProfile(),
+                                ); // Reload profile after editing
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: appTheme,
