@@ -5,6 +5,7 @@ import 'dart:io';
 import 'services/supabase_service.dart';
 import 'screens/auth_screen.dart';
 import 'screens/profile_completion_flow.dart';
+import 'screens/interests_management_page.dart';
 import 'models/profile_completion_models.dart';
 
 const appTheme = Color.fromRGBO(102, 51, 152, 1);
@@ -3618,6 +3619,95 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
+  Widget _buildInterestsSection() {
+    final currentProfile = widget.currentProfile;
+    final userInterests = currentProfile?.interests ?? [];
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Interests',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              TextButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const InterestsManagementPage(),
+                    ),
+                  );
+                  // Optionally refresh profile data if interests were updated
+                  if (result != null) {
+                    // You could call a refresh method here if needed
+                  }
+                },
+                icon: const Icon(Icons.edit, size: 16),
+                label: const Text('Edit'),
+                style: TextButton.styleFrom(foregroundColor: appTheme),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (userInterests.isEmpty)
+            Text(
+              'No interests selected. Add some interests to help others find you!',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: userInterests.map((interest) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: getMaterialColor(appTheme).shade100,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: getMaterialColor(appTheme).shade300,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (interest.icon != null) ...[
+                        Text(interest.icon!),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        interest.name,
+                        style: TextStyle(
+                          color: appTheme,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -3669,6 +3759,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               maxLines: 4,
             ),
+            const SizedBox(height: 20),
+            _buildInterestsSection(),
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
