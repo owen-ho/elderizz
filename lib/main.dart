@@ -600,6 +600,12 @@ class DataService {
     return getSampleUsers();
   }
 
+  /*
+Making Traditional Ang Ku Kueh!
+Photography Walk: Fall Colors, 
+Art & Craft Workshop, 
+Jazz & Wine Evening
+*/
   static List<EventModel> getSampleEvents() {
     final now = DateTime.now();
     final a = [
@@ -689,20 +695,6 @@ class DataService {
       ),
       EventModel(
         id: '7',
-        title: 'Bridge Tournament Finals',
-        location: 'Senior Center',
-        dateTime: now.add(const Duration(days: 6)),
-        category: 'Bridge',
-        imageUrl: 'assets/images/bridge.jpg',
-        description:
-            'Final round of our monthly bridge tournament. Spectators welcome! Cash prizes for top 3 teams.',
-        participantCount: 32,
-        maxParticipants: 40,
-        organizerId: 'org_7',
-        createdAt: now.subtract(const Duration(days: 15)),
-      ),
-      EventModel(
-        id: '8',
         title: 'Photography Walk: Fall Colors',
         location: 'Botanical Gardens',
         dateTime: now.add(const Duration(days: 7)),
@@ -716,7 +708,7 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 8)),
       ),
       EventModel(
-        id: '9',
+        id: '8',
         title: 'Art & Craft Workshop',
         location: 'Community Art Center',
         dateTime: now.add(const Duration(days: 9)),
@@ -730,7 +722,7 @@ class DataService {
         createdAt: now.subtract(const Duration(days: 4)),
       ),
       EventModel(
-        id: '10',
+        id: '9',
         title: 'Jazz & Wine Evening',
         location: 'Harbor Lounge',
         dateTime: now.add(const Duration(days: 8)),
