@@ -501,37 +501,32 @@ class DataService {
     final now = DateTime.now();
     return [
       UserModel(
-        id: '1',
-        fullName: 'Margaret Johnson',
+        id: 'sarah_id',
+        fullName: 'Sarah',
         age: 68,
         location: 'New York, NY',
         bio:
-            'Love gardening, reading, and spending time with my grandchildren. Looking for someone to share life\'s adventures with.',
+            'Love gardening, reading, and spending time with my grandchildren.',
         interests: [
           Interest(id: '1', name: 'Gardening', icon: '🌱', createdAt: now),
           Interest(id: '2', name: 'Reading', icon: '📚', createdAt: now),
-          Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
-          Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
         ],
         profileImageUrl: 'assets/images/pp1.jpg',
         status: 'online',
         gender: 'female',
         createdAt: now.subtract(const Duration(days: 30)),
-        updatedAt: now.subtract(const Duration(days: 1)),
+        updatedAt: now.subtract(const Duration(hours: 1)),
         lastActive: now.subtract(const Duration(minutes: 5)),
       ),
       UserModel(
-        id: '2',
-        fullName: 'Robert Smith',
+        id: 'alex_id',
+        fullName: 'Alex',
         age: 72,
         location: 'Los Angeles, CA',
-        bio:
-            'Retired teacher who enjoys hiking, photography, and good conversation. Seeking a kind companion for this chapter of life.',
+        bio: 'Retired teacher who loves coffee and good conversation.',
         interests: [
-          Interest(id: '5', name: 'Photography', icon: '📷', createdAt: now),
-          Interest(id: '6', name: 'Hiking', icon: '🥾', createdAt: now),
-          Interest(id: '7', name: 'Movies', icon: '🎬', createdAt: now),
-          Interest(id: '8', name: 'Music', icon: '🎵', createdAt: now),
+          Interest(id: '3', name: 'Coffee', icon: '☕', createdAt: now),
+          Interest(id: '4', name: 'Reading', icon: '📚', createdAt: now),
         ],
         profileImageUrl: 'assets/images/mpp1.jpg',
         status: 'offline',
@@ -541,17 +536,14 @@ class DataService {
         lastActive: now.subtract(const Duration(hours: 3)),
       ),
       UserModel(
-        id: '3',
-        fullName: 'Dorothy Williams',
+        id: 'emma_id',
+        fullName: 'Emma',
         age: 65,
         location: 'Chicago, IL',
-        bio:
-            'Recently widowed, ready to find joy again. Love painting, bridge, and volunteer work at the local shelter.',
+        bio: 'Art enthusiast and volunteer at the local shelter.',
         interests: [
-          Interest(id: '9', name: 'Painting', icon: '🎨', createdAt: now),
-          Interest(id: '10', name: 'Bridge', icon: '🃏', createdAt: now),
-          Interest(id: '11', name: 'Volunteering', icon: '🤝', createdAt: now),
-          Interest(id: '12', name: 'Dancing', icon: '💃', createdAt: now),
+          Interest(id: '9', name: 'Art', icon: '�', createdAt: now),
+          Interest(id: '10', name: 'Volunteering', icon: '🤝', createdAt: now),
         ],
         profileImageUrl: 'assets/images/pp2.jpg',
         status: 'online',
@@ -561,24 +553,38 @@ class DataService {
         lastActive: now.subtract(const Duration(minutes: 15)),
       ),
       UserModel(
-        id: '4',
-        fullName: 'Frank Miller',
+        id: 'jessica_id',
+        fullName: 'Jessica',
         age: 70,
         location: 'Miami, FL',
-        bio:
-            'Widower looking for companionship. Enjoy fishing, golf, and cooking for someone special.',
+        bio: 'Enjoying retirement and looking for new adventures.',
         interests: [
-          Interest(id: '13', name: 'Fishing', icon: '🎣', createdAt: now),
-          Interest(id: '14', name: 'Golf', icon: '⛳', createdAt: now),
-          Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
-          Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
+          Interest(id: '13', name: 'Travel', icon: '✈️', createdAt: now),
+          Interest(id: '14', name: 'Dancing', icon: '💃', createdAt: now),
+        ],
+        profileImageUrl: 'assets/images/pp3.jpg',
+        status: 'offline',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 60)),
+        updatedAt: now.subtract(const Duration(days: 3)),
+        lastActive: now.subtract(const Duration(days: 1)),
+      ),
+      UserModel(
+        id: 'michael_id',
+        fullName: 'Michael',
+        age: 67,
+        location: 'Denver, CO',
+        bio: 'Outdoor enthusiast who loves hiking and photography.',
+        interests: [
+          Interest(id: '15', name: 'Hiking', icon: '🥾', createdAt: now),
+          Interest(id: '16', name: 'Photography', icon: '📷', createdAt: now),
         ],
         profileImageUrl: 'assets/images/mpp2.jpg',
         status: 'online',
         gender: 'male',
-        createdAt: now.subtract(const Duration(days: 60)),
-        updatedAt: now.subtract(const Duration(days: 3)),
-        lastActive: now.subtract(const Duration(minutes: 30)),
+        createdAt: now.subtract(const Duration(days: 25)),
+        updatedAt: now.subtract(const Duration(hours: 4)),
+        lastActive: now.subtract(const Duration(hours: 1)),
       ),
     ];
   }
@@ -762,21 +768,52 @@ Jazz & Wine Evening
       ChatMessage(
         id: '1',
         conversationId: 'conv_1',
-        senderId: '1',
+        senderId: 'sarah_id',
         receiverId: 'current_user',
-        content:
-            'Hello! I saw your profile and thought we might have a lot in common.',
-        createdAt: now.subtract(const Duration(hours: 2)),
-        updatedAt: now.subtract(const Duration(hours: 2)),
+        content: 'Hey! How was your day?',
+        createdAt: now.subtract(const Duration(minutes: 2)),
+        updatedAt: now.subtract(const Duration(minutes: 2)),
+        isRead: false,
       ),
       ChatMessage(
         id: '2',
         conversationId: 'conv_2',
-        senderId: '2',
+        senderId: 'alex_id',
         receiverId: 'current_user',
-        content: 'Would you like to grab coffee sometime?',
-        createdAt: now.subtract(const Duration(hours: 5)),
-        updatedAt: now.subtract(const Duration(hours: 5)),
+        content: 'That coffee place was amazing! ☕',
+        createdAt: now.subtract(const Duration(hours: 1)),
+        updatedAt: now.subtract(const Duration(hours: 1)),
+        isRead: true,
+      ),
+      ChatMessage(
+        id: '3',
+        conversationId: 'conv_3',
+        senderId: 'emma_id',
+        receiverId: 'current_user',
+        content: 'Would love to check out that art gallery!',
+        createdAt: now.subtract(const Duration(hours: 3)),
+        updatedAt: now.subtract(const Duration(hours: 3)),
+        isRead: false,
+      ),
+      ChatMessage(
+        id: '4',
+        conversationId: 'conv_4',
+        senderId: 'jessica_id',
+        receiverId: 'current_user',
+        content: 'Thanks for the great evening! 😊',
+        createdAt: now.subtract(const Duration(days: 1)),
+        updatedAt: now.subtract(const Duration(days: 1)),
+        isRead: true,
+      ),
+      ChatMessage(
+        id: '5',
+        conversationId: 'conv_5',
+        senderId: 'michael_id',
+        receiverId: 'current_user',
+        content: 'Looking forward to our hiking trip!',
+        createdAt: now.subtract(const Duration(days: 2)),
+        updatedAt: now.subtract(const Duration(days: 2)),
+        isRead: true,
       ),
     ];
   }
@@ -1735,109 +1772,185 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  const Text(
-                    'ELDERIZZ',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: appTheme,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Messages',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_horiz, color: Colors.black87),
+            onPressed: () {
+              // Add menu functionality here
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Search bar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search messages...',
+                hintStyle: TextStyle(color: Colors.grey.shade500),
+                prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
             ),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : messages.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No messages yet\nStart exploring to connect with people!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final message = messages[index];
-                        final sender = users.firstWhere(
-                          (user) => user.id == message.senderId,
-                        );
+          ),
 
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: ListTile(
-                            leading: ProfileImageWidget(
-                              imageUrl: sender.profileImageUrl,
-                              size: 40,
-                            ),
-                            title: Text(sender.name),
-                            subtitle: Text(
-                              message.message,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Text(
-                              _formatTime(message.timestamp),
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ChatDetailPage(user: sender),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
+          // Messages list
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : messages.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No messages yet\nStart exploring to connect with people!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const LikesPage()),
-            );
-          },
-          backgroundColor: appTheme,
-          child: const Icon(Icons.favorite, color: Colors.white),
-        ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      final sender = users.firstWhere(
+                        (user) => user.id == message.senderId,
+                        orElse: () => users.first,
+                      );
+
+                      return _buildMessageItem(sender, message);
+                    },
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const LikesPage()),
+          );
+        },
+        backgroundColor: appTheme,
+        child: const Icon(Icons.favorite, color: Colors.white),
       ),
     );
   }
 
-  String _formatTime(DateTime dateTime) {
+  Widget _buildMessageItem(UserModel sender, ChatMessage message) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        leading: Stack(
+          children: [
+            ProfileImageWidget(
+              imageUrl: sender.profileImageUrl,
+              size: 50,
+              isCircular: true,
+            ),
+            // Online indicator
+            if (sender.status == 'online')
+              Positioned(
+                bottom: 2,
+                right: 2,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        title: Text(
+          sender.name,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(
+            message.content,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+          ),
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatMessageTime(message.createdAt),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+            ),
+            const SizedBox(height: 4),
+            // Unread indicator
+            if (!message.isRead)
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: appTheme,
+                  shape: BoxShape.circle,
+                ),
+              ),
+          ],
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatDetailPage(user: sender),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _formatMessageTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else {
+    if (difference.inMinutes < 60) {
       return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays == 1) {
+      return '1d ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '${(difference.inDays / 7).floor()}w ago';
     }
   }
 }
@@ -2523,169 +2636,141 @@ class _ProfilePageState extends State<ProfilePage> {
         //     ),
         //   ],
         // ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 20),
-              child: Row(
-                children: [
-                  const Text(
-                    'ELDERIZZ',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: appTheme,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : currentUserProfile == null
-                  ? const Center(child: Text('No profile data available'))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Column(
+        body: Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : currentUserProfile == null
+              ? const Center(child: Text('No profile data available'))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            ProfileImageWidget(
+                              imageUrl: currentUserProfile!.profileImageUrl,
+                              size: 120,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                ProfileImageWidget(
-                                  imageUrl: currentUserProfile!.profileImageUrl,
-                                  size: 120,
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Colors.grey,
+                                  size: 18,
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(width: 4),
                                 Text(
-                                  '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      color: Colors.grey,
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      currentUserProfile!.location,
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
+                                  currentUserProfile!.location,
+                                  style: const TextStyle(color: Colors.grey),
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 30),
-                          const Text(
-                            'About Me',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            currentUserProfile!.bio ??
-                                'No bio available yet. Add one by editing your profile!',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'My Interests',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          currentUserProfile!.interests.isEmpty
-                              ? const Text(
-                                  'No interests added yet. Add some by editing your profile!',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                )
-                              : Wrap(
-                                  spacing: 8,
-                                  children: currentUserProfile!.interests.map((
-                                    interest,
-                                  ) {
-                                    return Chip(
-                                      label: Text(interest.name),
-                                      backgroundColor: getMaterialColor(
-                                        appTheme,
-                                      ).shade100,
-                                    );
-                                  }).toList(),
-                                ),
-                          const SizedBox(height: 30),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditProfilePage(
-                                      currentProfile: currentUserProfile,
-                                    ),
-                                  ),
-                                ).then(
-                                  (_) => _loadCurrentProfile(),
-                                ); // Reload profile after editing
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: appTheme,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                ),
-                              ),
-                              child: const Text(
-                                'Edit Profile',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                _showSettingsDialog(context);
-                              },
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: appTheme),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                ),
-                              ),
-                              child: const Text(
-                                'Settings',
-                                style: TextStyle(fontSize: 16, color: appTheme),
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-            ),
-          ],
+                      const SizedBox(height: 30),
+                      const Text(
+                        'About Me',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        currentUserProfile!.bio ??
+                            'No bio available yet. Add one by editing your profile!',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'My Interests',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      currentUserProfile!.interests.isEmpty
+                          ? const Text(
+                              'No interests added yet. Add some by editing your profile!',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            )
+                          : Wrap(
+                              spacing: 8,
+                              children: currentUserProfile!.interests.map((
+                                interest,
+                              ) {
+                                return Chip(
+                                  label: Text(interest.name),
+                                  backgroundColor: getMaterialColor(
+                                    appTheme,
+                                  ).shade100,
+                                );
+                              }).toList(),
+                            ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfilePage(
+                                  currentProfile: currentUserProfile,
+                                ),
+                              ),
+                            ).then(
+                              (_) => _loadCurrentProfile(),
+                            ); // Reload profile after editing
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: appTheme,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Edit Profile',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _showSettingsDialog(context);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: appTheme),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Settings',
+                            style: TextStyle(fontSize: 16, color: appTheme),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
         ),
       ),
     );
