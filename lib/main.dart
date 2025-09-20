@@ -757,81 +757,40 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.grey.shade100,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Age Range',
-                                border: OutlineInputBorder(),
-                              ),
-                              value: selectedAgeRange,
-                              items: ageRanges.map((String age) {
-                                return DropdownMenuItem<String>(
-                                  value: age,
-                                  child: Text(age),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedAgeRange = newValue!;
-                                  _applyFilters();
-                                });
-                              },
-                            ),
+                // Filters by interest in the form of pill buttons which can be active/inactive, updating the listview accordingly
+                // Interest filter pills
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: interests.map((interest) {
+                      final isSelected = selectedInterest == interest;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(interest),
+                          selected: isSelected,
+                          selectedColor: Colors.teal,
+                          backgroundColor: Colors.teal.shade50,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : Colors.teal,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Location',
-                                border: OutlineInputBorder(),
-                              ),
-                              value: selectedLocation,
-                              items: locations.map((String location) {
-                                return DropdownMenuItem<String>(
-                                  value: location,
-                                  child: Text(location),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedLocation = newValue!;
-                                  _applyFilters();
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Interest',
-                          border: OutlineInputBorder(),
-                        ),
-                        value: selectedInterest,
-                        items: interests.map((String interest) {
-                          return DropdownMenuItem<String>(
-                            value: interest,
-                            child: Text(interest),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedInterest = newValue!;
+                          onSelected: (selected) {
+                            setState(() {
+                              selectedInterest = interest;
+                            });
                             _applyFilters();
-                          });
-                        },
-                      ),
-                    ],
+                          },
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
+
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
@@ -844,7 +803,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           contentPadding: const EdgeInsets.all(16),
                           leading: CircleAvatar(
                             radius: 30,
-                            child: Image.asset(user.profileImage),
+                            foregroundImage: AssetImage(user.profileImage),
                           ),
                           title: Text('${user.name}, ${user.age}'),
                           subtitle: Column(
