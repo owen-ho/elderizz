@@ -675,6 +675,7 @@ class _ExplorePageState extends State<ExplorePage> {
         'liked_user_id': currentUser.id,
       });
     } catch (e) {
+      debugPrint('Error liking profile: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error liking profile: ${e.toString()}'),

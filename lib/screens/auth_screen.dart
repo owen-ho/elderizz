@@ -256,6 +256,7 @@ class _SignUpFormState extends State<SignUpForm> {
       }
     } catch (e) {
       if (!mounted) return;
+      debugPrint('Sign up error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign up failed: ${e.toString()}')),
       );
@@ -305,6 +306,7 @@ class _SignUpFormState extends State<SignUpForm> {
         Row(
           children: [
             Expanded(
+              flex: 2,
               child: TextField(
                 controller: _ageController,
                 decoration: const InputDecoration(
@@ -318,7 +320,7 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
             const SizedBox(width: 16),
             Expanded(
-              flex: 2,
+              flex: 3,
               child: TextField(
                 controller: _locationController,
                 decoration: const InputDecoration(
