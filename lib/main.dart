@@ -561,12 +561,21 @@ class _ExplorePageState extends State<ExplorePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Center(
-                                  child: Image.asset(
-                                    users[currentIndex].profileImage,
-                                    height: 300,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child:
+                                      users[currentIndex].profileImage
+                                          .startsWith('http')
+                                      ? Image.network(
+                                          users[currentIndex].profileImage,
+                                          height: 300,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          users[currentIndex].profileImage,
+                                          height: 300,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                                 const SizedBox(height: 20),
                                 Flexible(
@@ -832,7 +841,10 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           contentPadding: const EdgeInsets.all(16),
                           leading: CircleAvatar(
                             radius: 30,
-                            foregroundImage: AssetImage(user.profileImage),
+                            foregroundImage:
+                                user.profileImage.startsWith('http')
+                                ? NetworkImage(user.profileImage)
+                                : AssetImage(user.profileImage),
                           ),
                           title: Text('${user.name}, ${user.age}'),
                           subtitle: Column(
@@ -1060,7 +1072,9 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   child: ListTile(
                     leading: CircleAvatar(
-                      foregroundImage: AssetImage(sender.profileImage),
+                      foregroundImage: sender.profileImage.startsWith('http')
+                          ? NetworkImage(sender.profileImage)
+                          : AssetImage(sender.profileImage),
                     ),
                     title: Text(sender.name),
                     subtitle: Text(
@@ -1212,7 +1226,11 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(foregroundImage: AssetImage(widget.user.profileImage)),
+            CircleAvatar(
+              foregroundImage: widget.user.profileImage.startsWith('http')
+                  ? NetworkImage(widget.user.profileImage)
+                  : AssetImage(widget.user.profileImage),
+            ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1435,7 +1453,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   Center(
                     child: Column(
                       children: [
-                        Image.asset(currentUserProfile!.profileImage),
+                        currentUserProfile!.profileImage.startsWith('http')
+                            ? Image.network(currentUserProfile!.profileImage)
+                            : Image.asset(currentUserProfile!.profileImage),
                         const SizedBox(height: 10),
                         Text(
                           '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
@@ -1786,7 +1806,9 @@ class OtherProfilePage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Image.asset(user.profileImage),
+                  user.profileImage.startsWith('http')
+                      ? Image.network(user.profileImage)
+                      : Image.asset(user.profileImage),
                   const SizedBox(height: 10),
                   Text(
                     '${user.name}, ${user.age}',
