@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Golden Connections',
+      title: 'Elderizz',
       theme: ThemeData(
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -56,7 +56,7 @@ class ElderlyDatingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Golden Connections',
+      title: 'Elderizz',
       theme: ThemeData(
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -181,7 +181,8 @@ class UserModel {
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
       lastActive: DateTime.parse(json['last_active']),
-      interests: (json['user_interests'] as List<dynamic>?)
+      interests:
+          (json['user_interests'] as List<dynamic>?)
               ?.map((i) => Interest.fromJson(i['interests']))
               .toList() ??
           [],
@@ -332,7 +333,7 @@ class DataService {
           Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
           Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
         ],
-        profileImageUrl: '👩‍🦳',
+        profileImageUrl: 'assets/images/pp1.jpg',
         status: 'online',
         gender: 'female',
         createdAt: now.subtract(const Duration(days: 30)),
@@ -352,7 +353,7 @@ class DataService {
           Interest(id: '7', name: 'Movies', icon: '🎬', createdAt: now),
           Interest(id: '8', name: 'Music', icon: '🎵', createdAt: now),
         ],
-        profileImageUrl: '👨‍🦳',
+        profileImageUrl: 'assets/images/mpp1.jpg',
         status: 'offline',
         gender: 'male',
         createdAt: now.subtract(const Duration(days: 45)),
@@ -372,7 +373,7 @@ class DataService {
           Interest(id: '11', name: 'Volunteering', icon: '🤝', createdAt: now),
           Interest(id: '12', name: 'Dancing', icon: '💃', createdAt: now),
         ],
-        profileImageUrl: '👵',
+        profileImageUrl: 'assets/images/pp2.jpg',
         status: 'online',
         gender: 'female',
         createdAt: now.subtract(const Duration(days: 20)),
@@ -392,7 +393,7 @@ class DataService {
           Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
           Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
         ],
-        profileImageUrl: '👴',
+        profileImageUrl: 'assets/images/mpp2.jpg',
         status: 'online',
         gender: 'male',
         createdAt: now.subtract(const Duration(days: 60)),
@@ -503,30 +504,26 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Explore Profiles'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : users.isEmpty
-              ? const Center(child: Text('No profiles to show'))
-              : Column(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.all(16),
-                        child: Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+    return SafeArea(
+      child: Scaffold(
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : users.isEmpty
+            ? const Center(child: Text('No profiles to show'))
+            : Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.all(16),
+                      child: Card(
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -537,61 +534,77 @@ class _ExplorePageState extends State<ExplorePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Center(
-                                  child: Text(
+                                  child: Image.asset(
                                     users[currentIndex].profileImage,
-                                    style: const TextStyle(fontSize: 80),
+                                    height: 300,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                Text(
-                                  '${users[currentIndex].name}, ${users[currentIndex].age}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      color: Colors.grey,
-                                      size: 18,
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      users[currentIndex].location,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
+                                    child: ListView(
+                                      children: [
+                                        Text(
+                                          '${users[currentIndex].name}, ${users[currentIndex].age}',
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.location_on,
+                                              color: Colors.grey,
+                                              size: 18,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              users[currentIndex].location,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          users[currentIndex].bio ??
+                                              'No bio available',
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        const Text(
+                                          'Interests:',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Wrap(
+                                          spacing: 8,
+                                          children: users[currentIndex]
+                                              .interests
+                                              .map((interest) {
+                                                return Chip(
+                                                  label: Text(interest.name),
+                                                  backgroundColor:
+                                                      Colors.teal.shade100,
+                                                );
+                                              })
+                                              .toList(),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  users[currentIndex].bio ?? 'No bio available',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Interests:',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 8,
-                                  children: users[currentIndex].interests.map((
-                                    interest,
-                                  ) {
-                                    return Chip(
-                                      label: Text(interest.name),
-                                      backgroundColor: Colors.teal.shade100,
-                                    );
-                                  }).toList(),
                                 ),
                               ],
                             ),
@@ -599,33 +612,37 @@ class _ExplorePageState extends State<ExplorePage> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          FloatingActionButton(
-                            onPressed: () {
-                              _nextProfile();
-                            },
-                            backgroundColor: Colors.red,
-                            heroTag: "pass",
-                            child: const Icon(Icons.close, color: Colors.white),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FloatingActionButton(
+                          onPressed: () {
+                            _nextProfile();
+                          },
+                          backgroundColor: Colors.red,
+                          heroTag: "pass",
+                          child: const Icon(Icons.close, color: Colors.white),
+                        ),
+                        FloatingActionButton(
+                          onPressed: () {
+                            _likeProfile();
+                          },
+                          backgroundColor: Colors.green,
+                          heroTag: "like",
+                          child: const Icon(
+                            Icons.favorite,
+                            color: Colors.white,
                           ),
-                          FloatingActionButton(
-                            onPressed: () {
-                              _likeProfile();
-                            },
-                            backgroundColor: Colors.green,
-                            heroTag: "like",
-                            child:
-                                const Icon(Icons.favorite, color: Colors.white),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 
@@ -654,8 +671,9 @@ class _ExplorePageState extends State<ExplorePage> {
       );
 
       // Log the activity
-      await SupabaseService.logActivity(
-          'like', {'liked_user_id': currentUser.id});
+      await SupabaseService.logActivity('like', {
+        'liked_user_id': currentUser.id,
+      });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -825,10 +843,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           contentPadding: const EdgeInsets.all(16),
                           leading: CircleAvatar(
                             radius: 30,
-                            child: Text(
-                              user.profileImage,
-                              style: const TextStyle(fontSize: 30),
-                            ),
+                            child: Image.asset(user.profileImage),
                           ),
                           title: Text('${user.name}, ${user.age}'),
                           subtitle: Column(
@@ -917,8 +932,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
       }
 
       // Determine location filter
-      String? locationFilter =
-          selectedLocation == 'All Locations' ? null : selectedLocation;
+      String? locationFilter = selectedLocation == 'All Locations'
+          ? null
+          : selectedLocation;
 
       // Get filtered users from Supabase
       final filteredUsersFromDb = await SupabaseService.getDiscoverableUsers(
@@ -928,12 +944,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
       );
 
       // Apply interest filter locally (since it's more complex)
-      List<UserModel> finalFilteredUsers =
-          filteredUsersFromDb.cast<UserModel>();
+      List<UserModel> finalFilteredUsers = filteredUsersFromDb
+          .cast<UserModel>();
       if (selectedInterest != 'All Interests') {
         finalFilteredUsers = filteredUsersFromDb
-            .where((user) => user.interests
-                .any((interest) => interest.name == selectedInterest))
+            .where(
+              (user) => user.interests.any(
+                (interest) => interest.name == selectedInterest,
+              ),
+            )
             .cast<UserModel>()
             .toList();
       }
@@ -946,11 +965,14 @@ class _DiscoverPageState extends State<DiscoverPage> {
       print('Error applying filters: $e');
       // Fallback to local filtering
       filteredUsers = users.where((user) {
-        bool ageMatch = selectedAgeRange == 'All Ages' ||
+        bool ageMatch =
+            selectedAgeRange == 'All Ages' ||
             _isAgeInRange(user.age, selectedAgeRange);
-        bool locationMatch = selectedLocation == 'All Locations' ||
+        bool locationMatch =
+            selectedLocation == 'All Locations' ||
             user.location == selectedLocation;
-        bool interestMatch = selectedInterest == 'All Interests' ||
+        bool interestMatch =
+            selectedInterest == 'All Interests' ||
             user.interests.any((interest) => interest.name == selectedInterest);
 
         return ageMatch && locationMatch && interestMatch;
@@ -1027,57 +1049,52 @@ class _ChatPageState extends State<ChatPage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : messages.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No messages yet\nStart exploring to connect with people!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    final sender = users.firstWhere(
-                      (user) => user.id == message.senderId,
-                    );
+          ? const Center(
+              child: Text(
+                'No messages yet\nStart exploring to connect with people!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+          : ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                final sender = users.firstWhere(
+                  (user) => user.id == message.senderId,
+                );
 
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          child: Text(
-                            sender.profileImage,
-                            style: const TextStyle(fontSize: 20),
-                          ),
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Image.asset(sender.profileImage),
+                    ),
+                    title: Text(sender.name),
+                    subtitle: Text(
+                      message.message,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Text(
+                      _formatTime(message.timestamp),
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatDetailPage(user: sender),
                         ),
-                        title: Text(sender.name),
-                        subtitle: Text(
-                          message.message,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        trailing: Text(
-                          _formatTime(message.timestamp),
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 12),
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ChatDetailPage(user: sender),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
     );
   }
 
@@ -1147,11 +1164,13 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 
         setState(() {
           _messages = messages
-              .map((msg) => {
-                    'message': msg.content,
-                    'isMe': msg.senderId == currentUserId,
-                    'timestamp': msg.createdAt,
-                  })
+              .map(
+                (msg) => {
+                  'message': msg.content,
+                  'isMe': msg.senderId == currentUserId,
+                  'timestamp': msg.createdAt,
+                },
+              )
               .toList();
           isLoading = false;
         });
@@ -1204,12 +1223,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              child: Text(
-                widget.user.profileImage,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
+            CircleAvatar(child: Image.asset(widget.user.profileImage)),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1414,7 +1428,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       EditProfilePage(currentProfile: currentUserProfile),
                 ),
               ).then(
-                  (_) => _loadCurrentProfile()); // Reload profile after editing
+                (_) => _loadCurrentProfile(),
+              ); // Reload profile after editing
             },
           ),
         ],
@@ -1422,114 +1437,118 @@ class _ProfilePageState extends State<ProfilePage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : currentUserProfile == null
-              ? const Center(child: Text('No profile data available'))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Column(
+          ? const Center(child: Text('No profile data available'))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        Image.asset(currentUserProfile!.profileImage),
+                        const SizedBox(height: 10),
+                        Text(
+                          '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(currentUserProfile!.profileImage,
-                                style: const TextStyle(fontSize: 80)),
-                            const SizedBox(height: 10),
-                            Text(
-                              '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            const Icon(
+                              Icons.location_on,
+                              color: Colors.grey,
+                              size: 18,
                             ),
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.location_on,
-                                    color: Colors.grey, size: 18),
-                                const SizedBox(width: 4),
-                                Text(currentUserProfile!.location,
-                                    style: const TextStyle(color: Colors.grey)),
-                              ],
+                            const SizedBox(width: 4),
+                            Text(
+                              currentUserProfile!.location,
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                      const Text(
-                        'About Me',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        currentUserProfile!.bio ??
-                            'No bio available yet. Add one by editing your profile!',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'My Interests',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      currentUserProfile!.interests.isEmpty
-                          ? const Text(
-                              'No interests added yet. Add some by editing your profile!',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            )
-                          : Wrap(
-                              spacing: 8,
-                              children:
-                                  currentUserProfile!.interests.map((interest) {
-                                return Chip(
-                                  label: Text(interest.name),
-                                  backgroundColor: Colors.teal.shade100,
-                                );
-                              }).toList(),
-                            ),
-                      const SizedBox(height: 30),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const EditProfilePage(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text(
-                            'Edit Profile',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            _showSettingsDialog(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.teal),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text(
-                            'Settings',
-                            style: TextStyle(fontSize: 16, color: Colors.teal),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'About Me',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    currentUserProfile!.bio ??
+                        'No bio available yet. Add one by editing your profile!',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'My Interests',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  currentUserProfile!.interests.isEmpty
+                      ? const Text(
+                          'No interests added yet. Add some by editing your profile!',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          children: currentUserProfile!.interests.map((
+                            interest,
+                          ) {
+                            return Chip(
+                              label: Text(interest.name),
+                              backgroundColor: Colors.teal.shade100,
+                            );
+                          }).toList(),
+                        ),
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EditProfilePage(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                      ),
+                      child: const Text(
+                        'Edit Profile',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        _showSettingsDialog(context);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.teal),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                      ),
+                      child: const Text(
+                        'Settings',
+                        style: TextStyle(fontSize: 16, color: Colors.teal),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -1568,8 +1587,10 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
-                title:
-                    const Text('Logout', style: TextStyle(color: Colors.red)),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.red),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   _signOut();
@@ -1774,7 +1795,7 @@ class OtherProfilePage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Text(user.profileImage, style: const TextStyle(fontSize: 80)),
+                  Image.asset(user.profileImage),
                   const SizedBox(height: 10),
                   Text(
                     '${user.name}, ${user.age}',
@@ -1834,8 +1855,10 @@ class OtherProfilePage extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(user.bio ?? 'No bio available',
-                style: const TextStyle(fontSize: 16)),
+            Text(
+              user.bio ?? 'No bio available',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 20),
             const Text(
               'Interests',

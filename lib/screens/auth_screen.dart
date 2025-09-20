@@ -38,13 +38,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        '💕',
-                        style: TextStyle(fontSize: 64),
-                      ),
+                      const Text('💕', style: TextStyle(fontSize: 64)),
                       const SizedBox(height: 16),
                       const Text(
-                        'Golden Connections',
+                        'Elderizz',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -246,7 +243,8 @@ class _SignUpFormState extends State<SignUpForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'Account created successfully! Please check your email to verify your account.'),
+              'Account created successfully! Please check your email to verify your account.',
+            ),
             backgroundColor: Colors.green,
           ),
         );
