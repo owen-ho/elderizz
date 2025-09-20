@@ -1139,10 +1139,10 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
-        body: isLoading
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      body: SafeArea(
+        child: isLoading
             ? const Center(child: CircularProgressIndicator())
             : filteredUsers.isEmpty
             ? const Center(child: Text('No profiles match your filters'))
@@ -1881,18 +1881,20 @@ class _EventsPageState extends State<EventsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Row(
                       children: [
                         const Text(
                           'ELDERIZZ',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: appTheme,
-                            letterSpacing: 2,
+                            letterSpacing: 1.5,
                           ),
                         ),
                       ],
@@ -2301,76 +2303,74 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Messages',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_horiz, color: Colors.black87),
-            onPressed: () {
-              // Add menu functionality here
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Search bar
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                children: [
+                  const Text(
+                    'ELDERIZZ',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: appTheme,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search messages...',
-                hintStyle: TextStyle(color: Colors.grey.shade500),
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+            // Search bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search messages...',
+                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Messages list
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : messages.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No messages yet\nStart exploring to connect with people!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+            // Messages list
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : messages.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No messages yet\nStart exploring to connect with people!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        final sender = users.firstWhere(
+                          (user) => user.id == message.senderId,
+                          orElse: () => users.first,
+                        );
+
+                        return _buildMessageItem(sender, message);
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      final sender = users.firstWhere(
-                        (user) => user.id == message.senderId,
-                        orElse: () => users.first,
-                      );
-
-                      return _buildMessageItem(sender, message);
-                    },
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -3140,189 +3140,231 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('My Profile'),
-        //   backgroundColor: appTheme,
-        //   foregroundColor: Colors.white,
-        //   actions: [
-        //     IconButton(
-        //       icon: const Icon(Icons.edit),
-        //       onPressed: () {
-        //         Navigator.push(
-        //           context,
-        //           MaterialPageRoute(
-        //             builder: (context) =>
-        //                 EditProfilePage(currentProfile: currentUserProfile),
-        //           ),
-        //         ).then(
-        //           (_) => _loadCurrentProfile(),
-        //         ); // Reload profile after editing
-        //       },
-        //     ),
-        //   ],
-        // ),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : currentUserProfile == null
-              ? const Center(child: Text('No profile data available'))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      // appBar: AppBar(
+      //   title: const Text('My Profile'),
+      //   backgroundColor: appTheme,
+      //   foregroundColor: Colors.white,
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.edit),
+      //       onPressed: () {
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //             builder: (context) =>
+      //                 EditProfilePage(currentProfile: currentUserProfile),
+      //           ),
+      //         ).then(
+      //           (_) => _loadCurrentProfile(),
+      //         ); // Reload profile after editing
+      //       },
+      //     ),
+      //   ],
+      // ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                children: [
+                  const Text(
+                    'ELDERIZZ',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: appTheme,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : currentUserProfile == null
+                    ? const Center(child: Text('No profile data available'))
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ProfileImageWidget(
-                              imageUrl: currentUserProfile!.profileImageUrl,
-                              size: 120,
+                            Center(
+                              child: Column(
+                                children: [
+                                  ProfileImageWidget(
+                                    imageUrl:
+                                        currentUserProfile!.profileImageUrl,
+                                    size: 120,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on,
+                                        color: Colors.grey,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        currentUserProfile!.location,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
-                              style: const TextStyle(
-                                fontSize: 24,
+                            const SizedBox(height: 30),
+                            const Text(
+                              'About Me',
+                              style: TextStyle(
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  color: Colors.grey,
-                                  size: 18,
+                            const SizedBox(height: 10),
+                            Text(
+                              currentUserProfile!.bio ??
+                                  'No bio available yet. Add one by editing your profile!',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'My Interests',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            currentUserProfile!.interests.isEmpty
+                                ? const Text(
+                                    'No interests added yet. Add some by editing your profile!',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  )
+                                : Wrap(
+                                    spacing: 8,
+                                    children: currentUserProfile!.interests.map(
+                                      (interest) {
+                                        return Chip(
+                                          label: Text(interest.name),
+                                          backgroundColor: getMaterialColor(
+                                            appTheme,
+                                          ).shade100,
+                                        );
+                                      },
+                                    ).toList(),
+                                  ),
+                            const SizedBox(height: 30),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditProfilePage(
+                                        currentProfile: currentUserProfile,
+                                      ),
+                                    ),
+                                  ).then(
+                                    (_) => _loadCurrentProfile(),
+                                  ); // Reload profile after editing
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: appTheme,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  currentUserProfile!.location,
-                                  style: const TextStyle(color: Colors.grey),
+                                child: const Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ProfileCompletionFlow(),
+                                    ),
+                                  ).then(
+                                    (_) => _loadCurrentProfile(),
+                                  ); // Reload profile after completion
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.purple,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Complete Your Profile',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  _showSettingsDialog(context);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: appTheme),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Settings',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: appTheme,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 30),
-                      const Text(
-                        'About Me',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        currentUserProfile!.bio ??
-                            'No bio available yet. Add one by editing your profile!',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'My Interests',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      currentUserProfile!.interests.isEmpty
-                          ? const Text(
-                              'No interests added yet. Add some by editing your profile!',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            )
-                          : Wrap(
-                              spacing: 8,
-                              children: currentUserProfile!.interests.map((
-                                interest,
-                              ) {
-                                return Chip(
-                                  label: Text(interest.name),
-                                  backgroundColor: getMaterialColor(
-                                    appTheme,
-                                  ).shade100,
-                                );
-                              }).toList(),
-                            ),
-                      const SizedBox(height: 30),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditProfilePage(
-                                  currentProfile: currentUserProfile,
-                                ),
-                              ),
-                            ).then(
-                              (_) => _loadCurrentProfile(),
-                            ); // Reload profile after editing
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: appTheme,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text(
-                            'Edit Profile',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ProfileCompletionFlow(),
-                              ),
-                            ).then(
-                              (_) => _loadCurrentProfile(),
-                            ); // Reload profile after completion
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.purple,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text(
-                            'Complete Your Profile',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            _showSettingsDialog(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: appTheme),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                          ),
-                          child: const Text(
-                            'Settings',
-                            style: TextStyle(fontSize: 16, color: appTheme),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
