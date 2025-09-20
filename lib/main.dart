@@ -1661,12 +1661,12 @@ class _ExplorePageState extends State<ExplorePage> {
       });
     } catch (e) {
       debugPrint('Error liking profile: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error liking profile: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Error liking profile: ${e.toString()}'),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
     }
 
     _nextProfile();
