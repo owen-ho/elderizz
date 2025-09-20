@@ -213,7 +213,7 @@ class UserModel {
 
   // Helper getter for backwards compatibility
   String get name => fullName;
-  String get profileImage => profileImageUrl ?? '👤';
+  String get profileImage => profileImageUrl ?? 'assets/images/no_image.jpg';
 }
 
 // Interest model
