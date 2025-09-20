@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../main.dart';
 
@@ -79,12 +80,16 @@ class SupabaseService {
   static Future<UserProfile?> getCurrentProfile() async {
     if (currentUserId == null) return null;
 
-    final response = await _client.from('profiles').select('''
+    final response = await _client
+        .from('profiles')
+        .select('''
           *,
           user_interests (
             interests (*)
           )
-        ''').eq('id', currentUserId!).maybeSingle();
+        ''')
+        .eq('id', currentUserId!)
+        .maybeSingle();
 
     if (response == null) return null;
     return UserProfile.fromJson(response);
@@ -94,6 +99,42 @@ class SupabaseService {
     if (currentUserId == null) return;
 
     await _client.from('profiles').update(updates).eq('id', currentUserId!);
+  }
+
+  // Profile Image Management
+  static Future<String> uploadProfileImage(String filePath) async {
+    if (currentUserId == null) throw Exception('User not authenticated');
+
+    final fileName =
+        '${currentUserId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final bucketName = 'profile-images';
+
+    // Upload to Supabase Storage
+    await _client.storage.from(bucketName).upload(fileName, File(filePath));
+
+    // Get public URL
+    final publicUrl = _client.storage.from(bucketName).getPublicUrl(fileName);
+
+    // Update profile with new image URL
+    await updateProfile({'profile_image_url': publicUrl});
+
+    return publicUrl;
+  }
+
+  static Future<void> deleteProfileImage(String imageUrl) async {
+    try {
+      // Extract filename from URL
+      final uri = Uri.parse(imageUrl);
+      final fileName = uri.pathSegments.last;
+
+      // Delete from storage
+      await _client.storage.from('profile-images').remove([fileName]);
+
+      // Update profile to remove image URL
+      await updateProfile({'profile_image_url': null});
+    } catch (e) {
+      print('Error deleting profile image: $e');
+    }
   }
 
   static Future<List<UserProfile>> getDiscoverableUsers({
@@ -151,10 +192,12 @@ class SupabaseService {
     // Then insert new interests
     if (interestIds.isNotEmpty) {
       final inserts = interestIds
-          .map((interestId) => {
-                'user_id': currentUserId!,
-                'interest_id': interestId,
-              })
+          .map(
+            (interestId) => {
+              'user_id': currentUserId!,
+              'interest_id': interestId,
+            },
+          )
           .toList();
 
       await _client.from('user_interests').insert(inserts);
@@ -247,10 +290,10 @@ class SupabaseService {
   }
 
   static Future<void> markMessageAsRead(String messageId) async {
-    await _client.from('messages').update({
-      'is_read': true,
-      'read_at': DateTime.now().toIso8601String(),
-    }).eq('id', messageId);
+    await _client
+        .from('messages')
+        .update({'is_read': true, 'read_at': DateTime.now().toIso8601String()})
+        .eq('id', messageId);
   }
 
   // Real-time subscriptions
@@ -277,9 +320,7 @@ class SupabaseService {
         .subscribe();
   }
 
-  static RealtimeChannel subscribeToMatches(
-    void Function(Match) onMatch,
-  ) {
+  static RealtimeChannel subscribeToMatches(void Function(Match) onMatch) {
     return _client
         .channel('matches:$currentUserId')
         .onPostgresChanges(
@@ -300,11 +341,15 @@ class SupabaseService {
   }
 
   static Future<Match> _fetchMatchWithProfiles(String matchId) async {
-    final response = await _client.from('matches').select('''
+    final response = await _client
+        .from('matches')
+        .select('''
           *,
           user1:profiles!matches_user1_id_fkey (*),
           user2:profiles!matches_user2_id_fkey (*)
-        ''').eq('id', matchId).single();
+        ''')
+        .eq('id', matchId)
+        .single();
 
     return Match.fromJson(response);
   }
@@ -336,8 +381,10 @@ class SupabaseService {
   }
 
   // User Activity Tracking
-  static Future<void> logActivity(String activityType,
-      [Map<String, dynamic>? metadata]) async {
+  static Future<void> logActivity(
+    String activityType, [
+    Map<String, dynamic>? metadata,
+  ]) async {
     if (currentUserId == null) return;
 
     await _client.from('user_activity').insert({
@@ -352,8 +399,8 @@ class SupabaseService {
 
     await _client
         .from('profiles')
-        .update({'last_active': DateTime.now().toIso8601String()}).eq(
-            'id', currentUserId!);
+        .update({'last_active': DateTime.now().toIso8601String()})
+        .eq('id', currentUserId!);
   }
 }
 
@@ -405,7 +452,8 @@ class UserProfile extends UserModel {
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
       lastActive: DateTime.parse(json['last_active']),
-      interests: (json['user_interests'] as List<dynamic>?)
+      interests:
+          (json['user_interests'] as List<dynamic>?)
               ?.map((i) => Interest.fromJson(i['interests']))
               .toList() ??
           [],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'services/supabase_service.dart';
 import 'screens/auth_screen.dart';
 
@@ -336,6 +338,74 @@ class ChatMessage {
   DateTime get timestamp => createdAt;
 }
 
+// Helper widget for displaying profile images
+class ProfileImageWidget extends StatelessWidget {
+  final String? imageUrl;
+  final double size;
+  final bool isCircular;
+
+  const ProfileImageWidget({
+    super.key,
+    required this.imageUrl,
+    this.size = 120,
+    this.isCircular = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget imageWidget;
+
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      if (imageUrl!.startsWith('http')) {
+        // Network image
+        imageWidget = Image.network(
+          imageUrl!,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildPlaceholder();
+          },
+        );
+      } else {
+        // Asset image
+        imageWidget = Image.asset(
+          imageUrl!,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildPlaceholder();
+          },
+        );
+      }
+    } else {
+      imageWidget = _buildPlaceholder();
+    }
+
+    if (isCircular) {
+      return ClipOval(child: imageWidget);
+    } else {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: imageWidget,
+      );
+    }
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: isCircular ? BoxShape.circle : BoxShape.rectangle,
+        color: Colors.grey.shade300,
+      ),
+      child: Icon(Icons.person, size: size * 0.5, color: Colors.grey.shade600),
+    );
+  }
+}
+
 // Data service - now uses Supabase for real data
 class DataService {
   // Keep sample data for development/fallback
@@ -561,21 +631,12 @@ class _ExplorePageState extends State<ExplorePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Center(
-                                  child:
-                                      users[currentIndex].profileImage
-                                          .startsWith('http')
-                                      ? Image.network(
-                                          users[currentIndex].profileImage,
-                                          height: 300,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.asset(
-                                          users[currentIndex].profileImage,
-                                          height: 300,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        ),
+                                  child: ProfileImageWidget(
+                                    imageUrl:
+                                        users[currentIndex].profileImageUrl,
+                                    size: 300,
+                                    isCircular: false,
+                                  ),
                                 ),
                                 const SizedBox(height: 20),
                                 Flexible(
@@ -839,12 +900,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         margin: const EdgeInsets.only(bottom: 16),
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(16),
-                          leading: CircleAvatar(
-                            radius: 30,
-                            foregroundImage:
-                                user.profileImage.startsWith('http')
-                                ? NetworkImage(user.profileImage)
-                                : AssetImage(user.profileImage),
+                          leading: ProfileImageWidget(
+                            imageUrl: user.profileImageUrl,
+                            size: 60,
                           ),
                           title: Text('${user.name}, ${user.age}'),
                           subtitle: Column(
@@ -1071,10 +1129,9 @@ class _ChatPageState extends State<ChatPage> {
                     vertical: 8,
                   ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      foregroundImage: sender.profileImage.startsWith('http')
-                          ? NetworkImage(sender.profileImage)
-                          : AssetImage(sender.profileImage),
+                    leading: ProfileImageWidget(
+                      imageUrl: sender.profileImageUrl,
+                      size: 40,
                     ),
                     title: Text(sender.name),
                     subtitle: Text(
@@ -1226,11 +1283,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              foregroundImage: widget.user.profileImage.startsWith('http')
-                  ? NetworkImage(widget.user.profileImage)
-                  : AssetImage(widget.user.profileImage),
-            ),
+            ProfileImageWidget(imageUrl: widget.user.profileImageUrl, size: 40),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1453,9 +1506,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   Center(
                     child: Column(
                       children: [
-                        currentUserProfile!.profileImage.startsWith('http')
-                            ? Image.network(currentUserProfile!.profileImage)
-                            : Image.asset(currentUserProfile!.profileImage),
+                        ProfileImageWidget(
+                          imageUrl: currentUserProfile!.profileImageUrl,
+                          size: 120,
+                        ),
                         const SizedBox(height: 10),
                         Text(
                           '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
@@ -1639,6 +1693,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late final TextEditingController _locationController;
   late final TextEditingController _bioController;
   bool isLoading = false;
+  String? _profileImageUrl;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -1648,6 +1705,145 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _ageController = TextEditingController(text: profile?.age.toString() ?? '');
     _locationController = TextEditingController(text: profile?.location ?? '');
     _bioController = TextEditingController(text: profile?.bio ?? '');
+    _profileImageUrl = profile?.profileImageUrl;
+  }
+
+  Future<void> _showImagePickerDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Profile Picture'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Take Photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              if (_profileImageUrl != null)
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: const Text(
+                    'Remove Picture',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _removeProfilePicture();
+                  },
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking image: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _removeProfilePicture() async {
+    if (_profileImageUrl != null) {
+      try {
+        await SupabaseService.deleteProfileImage(_profileImageUrl!);
+        setState(() {
+          _profileImageUrl = null;
+          _selectedImage = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile picture removed successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error removing picture: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
+  Widget _buildProfileImage() {
+    const double imageSize = 120;
+
+    if (_selectedImage != null) {
+      return ClipOval(
+        child: Image.file(
+          _selectedImage!,
+          width: imageSize,
+          height: imageSize,
+          fit: BoxFit.cover,
+        ),
+      );
+    } else if (_profileImageUrl != null && _profileImageUrl!.isNotEmpty) {
+      return ClipOval(
+        child: Image.network(
+          _profileImageUrl!,
+          width: imageSize,
+          height: imageSize,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: imageSize,
+              height: imageSize,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey,
+              ),
+              child: const Icon(Icons.person, size: 60, color: Colors.white),
+            );
+          },
+        ),
+      );
+    } else {
+      return Container(
+        width: imageSize,
+        height: imageSize,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey,
+        ),
+        child: const Icon(Icons.person, size: 60, color: Colors.white),
+      );
+    }
   }
 
   Future<void> _saveProfile() async {
@@ -1673,11 +1869,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
 
     try {
+      // Upload image if a new one was selected
+      String? imageUrl = _profileImageUrl;
+      if (_selectedImage != null) {
+        imageUrl = await SupabaseService.uploadProfileImage(
+          _selectedImage!.path,
+        );
+      }
+
+      // Update profile with all data
       await SupabaseService.updateProfile({
         'full_name': _nameController.text.trim(),
         'age': age,
         'location': _locationController.text.trim(),
         'bio': _bioController.text.trim(),
+        if (imageUrl != null) 'profile_image_url': imageUrl,
       });
 
       if (!mounted) return;
@@ -1712,11 +1918,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text('👤', style: TextStyle(fontSize: 80)),
+            _buildProfileImage(),
             TextButton(
-              onPressed: () {
-                // Handle profile picture change
-              },
+              onPressed: _showImagePickerDialog,
               child: const Text('Change Photo'),
             ),
             const SizedBox(height: 20),
@@ -1757,24 +1961,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Save profile changes
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile updated successfully!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  Navigator.pop(context);
-                },
+                onPressed: isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: appTheme,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                child: const Text(
-                  'Save Changes',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Save Changes',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
               ),
             ),
           ],
@@ -1806,9 +2003,7 @@ class OtherProfilePage extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  user.profileImage.startsWith('http')
-                      ? Image.network(user.profileImage)
-                      : Image.asset(user.profileImage),
+                  ProfileImageWidget(imageUrl: user.profileImageUrl, size: 120),
                   const SizedBox(height: 10),
                   Text(
                     '${user.name}, ${user.age}',
