@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'services/supabase_service.dart';
+import 'screens/auth_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,7 +10,44 @@ Future<void> main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wZW1kd2xoemVsa3FkeXVwdXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyODg3NzgsImV4cCI6MjA3Mzg2NDc3OH0.htNqcHH_IdaJIPvI2kIN3v1zbdEectRPuAQ8OQMW6O0',
   );
-  runApp(ElderlyDatingApp());
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Golden Connections',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontSize: 16),
+          bodyMedium: TextStyle(fontSize: 14),
+        ),
+      ),
+      home: StreamBuilder<AuthState>(
+        stream: SupabaseService.client.auth.onAuthStateChange,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final session = snapshot.hasData ? snapshot.data!.session : null;
+
+          if (session != null) {
+            return const ElderlyDatingApp();
+          } else {
+            return const AuthScreen();
+          }
+        },
+      ),
+    );
+  }
 }
 
 class ElderlyDatingApp extends StatelessWidget {
@@ -74,115 +112,357 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// User model
+// User model matching database schema
 class User {
   final String id;
-  final String name;
+  final String? email;
+  final String fullName;
   final int age;
   final String location;
-  final String bio;
-  final List<String> interests;
-  final String profileImage;
+  final String? bio;
+  final String? profileImageUrl;
   final String status;
+  final bool isVerified;
+  final bool isActive;
+  final DateTime? dateOfBirth;
+  final String? gender;
+  final List<String> lookingFor;
+  final int maxDistanceKm;
+  final int ageRangeMin;
+  final int ageRangeMax;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime lastActive;
+  final List<Interest> interests;
 
   User({
     required this.id,
-    required this.name,
+    this.email,
+    required this.fullName,
     required this.age,
     required this.location,
-    required this.bio,
-    required this.interests,
-    required this.profileImage,
-    required this.status,
+    this.bio,
+    this.profileImageUrl,
+    this.status = 'offline',
+    this.isVerified = false,
+    this.isActive = true,
+    this.dateOfBirth,
+    this.gender,
+    this.lookingFor = const [],
+    this.maxDistanceKm = 50,
+    this.ageRangeMin = 18,
+    this.ageRangeMax = 100,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.lastActive,
+    this.interests = const [],
   });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] as String,
+      email: json['email'] as String?,
+      fullName: json['full_name'] as String,
+      age: json['age'] as int,
+      location: json['location'] as String,
+      bio: json['bio'] as String?,
+      profileImageUrl: json['profile_image_url'] as String?,
+      status: json['status'] as String? ?? 'offline',
+      isVerified: json['is_verified'] as bool? ?? false,
+      isActive: json['is_active'] as bool? ?? true,
+      dateOfBirth: json['date_of_birth'] != null
+          ? DateTime.parse(json['date_of_birth'])
+          : null,
+      gender: json['gender'] as String?,
+      lookingFor: (json['looking_for'] as List<dynamic>?)?.cast<String>() ?? [],
+      maxDistanceKm: json['max_distance_km'] as int? ?? 50,
+      ageRangeMin: json['age_range_min'] as int? ?? 18,
+      ageRangeMax: json['age_range_max'] as int? ?? 100,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+      lastActive: DateTime.parse(json['last_active']),
+      interests: (json['user_interests'] as List<dynamic>?)
+              ?.map((i) => Interest.fromJson(i['interests']))
+              .toList() ??
+          [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'full_name': fullName,
+      'age': age,
+      'location': location,
+      'bio': bio,
+      'profile_image_url': profileImageUrl,
+      'status': status,
+      'is_verified': isVerified,
+      'is_active': isActive,
+      'date_of_birth': dateOfBirth?.toIso8601String().split('T')[0],
+      'gender': gender,
+      'looking_for': lookingFor,
+      'max_distance_km': maxDistanceKm,
+      'age_range_min': ageRangeMin,
+      'age_range_max': ageRangeMax,
+      'last_active': lastActive.toIso8601String(),
+    };
+  }
+
+  // Helper getter for backwards compatibility
+  String get name => fullName;
+  String get profileImage => profileImageUrl ?? '👤';
 }
 
-// Chat message model
+// Interest model
+class Interest {
+  final String id;
+  final String name;
+  final String? category;
+  final String? icon;
+  final bool isActive;
+  final DateTime createdAt;
+
+  Interest({
+    required this.id,
+    required this.name,
+    this.category,
+    this.icon,
+    this.isActive = true,
+    required this.createdAt,
+  });
+
+  factory Interest.fromJson(Map<String, dynamic> json) {
+    return Interest(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      category: json['category'] as String?,
+      icon: json['icon'] as String?,
+      isActive: json['is_active'] as bool? ?? true,
+      createdAt: DateTime.parse(json['created_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'category': category,
+      'icon': icon,
+      'is_active': isActive,
+    };
+  }
+}
+
+// Chat message model matching database schema
 class ChatMessage {
   final String id;
+  final String conversationId;
   final String senderId;
   final String receiverId;
-  final String message;
-  final DateTime timestamp;
+  final String content;
+  final String messageType;
+  final bool isRead;
+  final DateTime? readAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   ChatMessage({
     required this.id,
+    required this.conversationId,
     required this.senderId,
     required this.receiverId,
-    required this.message,
-    required this.timestamp,
+    required this.content,
+    this.messageType = 'text',
+    this.isRead = false,
+    this.readAt,
+    required this.createdAt,
+    required this.updatedAt,
   });
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      id: json['id'] as String,
+      conversationId: json['conversation_id'] as String,
+      senderId: json['sender_id'] as String,
+      receiverId: json['receiver_id'] as String,
+      content: json['content'] as String,
+      messageType: json['message_type'] as String? ?? 'text',
+      isRead: json['is_read'] as bool? ?? false,
+      readAt: json['read_at'] != null ? DateTime.parse(json['read_at']) : null,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'conversation_id': conversationId,
+      'sender_id': senderId,
+      'receiver_id': receiverId,
+      'content': content,
+      'message_type': messageType,
+      'is_read': isRead,
+      'read_at': readAt?.toIso8601String(),
+    };
+  }
+
+  // Helper getter for backwards compatibility
+  String get message => content;
+  DateTime get timestamp => createdAt;
 }
 
-// Sample data
+// Data service - now uses Supabase for real data
 class DataService {
-  static List<User> getUsers() {
+  // Keep sample data for development/fallback
+  static List<User> getSampleUsers() {
+    final now = DateTime.now();
     return [
       User(
         id: '1',
-        name: 'Margaret Johnson',
+        fullName: 'Margaret Johnson',
         age: 68,
         location: 'New York, NY',
         bio:
             'Love gardening, reading, and spending time with my grandchildren. Looking for someone to share life\'s adventures with.',
-        interests: ['Gardening', 'Reading', 'Cooking', 'Travel'],
-        profileImage: '👩‍🦳',
+        interests: [
+          Interest(id: '1', name: 'Gardening', icon: '🌱', createdAt: now),
+          Interest(id: '2', name: 'Reading', icon: '📚', createdAt: now),
+          Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
+          Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
+        ],
+        profileImageUrl: '👩‍🦳',
         status: 'online',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 30)),
+        updatedAt: now.subtract(const Duration(days: 1)),
+        lastActive: now.subtract(const Duration(minutes: 5)),
       ),
       User(
         id: '2',
-        name: 'Robert Smith',
+        fullName: 'Robert Smith',
         age: 72,
         location: 'Los Angeles, CA',
         bio:
             'Retired teacher who enjoys hiking, photography, and good conversation. Seeking a kind companion for this chapter of life.',
-        interests: ['Photography', 'Hiking', 'Movies', 'Music'],
-        profileImage: '👨‍🦳',
+        interests: [
+          Interest(id: '5', name: 'Photography', icon: '📷', createdAt: now),
+          Interest(id: '6', name: 'Hiking', icon: '🥾', createdAt: now),
+          Interest(id: '7', name: 'Movies', icon: '🎬', createdAt: now),
+          Interest(id: '8', name: 'Music', icon: '🎵', createdAt: now),
+        ],
+        profileImageUrl: '👨‍🦳',
         status: 'offline',
+        gender: 'male',
+        createdAt: now.subtract(const Duration(days: 45)),
+        updatedAt: now.subtract(const Duration(days: 2)),
+        lastActive: now.subtract(const Duration(hours: 3)),
       ),
       User(
         id: '3',
-        name: 'Dorothy Williams',
+        fullName: 'Dorothy Williams',
         age: 65,
         location: 'Chicago, IL',
         bio:
             'Recently widowed, ready to find joy again. Love painting, bridge, and volunteer work at the local shelter.',
-        interests: ['Painting', 'Bridge', 'Volunteering', 'Dancing'],
-        profileImage: '👵',
+        interests: [
+          Interest(id: '9', name: 'Painting', icon: '🎨', createdAt: now),
+          Interest(id: '10', name: 'Bridge', icon: '🃏', createdAt: now),
+          Interest(id: '11', name: 'Volunteering', icon: '🤝', createdAt: now),
+          Interest(id: '12', name: 'Dancing', icon: '💃', createdAt: now),
+        ],
+        profileImageUrl: '👵',
         status: 'online',
+        gender: 'female',
+        createdAt: now.subtract(const Duration(days: 20)),
+        updatedAt: now.subtract(const Duration(hours: 6)),
+        lastActive: now.subtract(const Duration(minutes: 15)),
       ),
       User(
         id: '4',
-        name: 'Frank Miller',
+        fullName: 'Frank Miller',
         age: 70,
         location: 'Miami, FL',
         bio:
             'Widower looking for companionship. Enjoy fishing, golf, and cooking for someone special.',
-        interests: ['Fishing', 'Golf', 'Cooking', 'Travel'],
-        profileImage: '👴',
+        interests: [
+          Interest(id: '13', name: 'Fishing', icon: '🎣', createdAt: now),
+          Interest(id: '14', name: 'Golf', icon: '⛳', createdAt: now),
+          Interest(id: '3', name: 'Cooking', icon: '👨‍🍳', createdAt: now),
+          Interest(id: '4', name: 'Travel', icon: '✈️', createdAt: now),
+        ],
+        profileImageUrl: '👴',
         status: 'online',
+        gender: 'male',
+        createdAt: now.subtract(const Duration(days: 60)),
+        updatedAt: now.subtract(const Duration(days: 3)),
+        lastActive: now.subtract(const Duration(minutes: 30)),
       ),
     ];
   }
 
-  static List<ChatMessage> getMessages() {
+  static Future<List<User>> getUsers() async {
+    try {
+      // Try to get users from Supabase
+      final users = await SupabaseService.getDiscoverableUsers();
+      if (users.isNotEmpty) {
+        return users.cast<User>();
+      }
+    } catch (e) {
+      print('Error fetching users from Supabase: $e');
+    }
+
+    // Fallback to sample data
+    return getSampleUsers();
+  }
+
+  static List<ChatMessage> getSampleMessages() {
+    final now = DateTime.now();
     return [
       ChatMessage(
         id: '1',
+        conversationId: 'conv_1',
         senderId: '1',
         receiverId: 'current_user',
-        message:
+        content:
             'Hello! I saw your profile and thought we might have a lot in common.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        createdAt: now.subtract(const Duration(hours: 2)),
+        updatedAt: now.subtract(const Duration(hours: 2)),
       ),
       ChatMessage(
         id: '2',
+        conversationId: 'conv_2',
         senderId: '2',
         receiverId: 'current_user',
-        message: 'Would you like to grab coffee sometime?',
-        timestamp: DateTime.now().subtract(const Duration(hours: 5)),
+        content: 'Would you like to grab coffee sometime?',
+        createdAt: now.subtract(const Duration(hours: 5)),
+        updatedAt: now.subtract(const Duration(hours: 5)),
       ),
     ];
+  }
+
+  static Future<List<ChatMessage>> getMessages() async {
+    try {
+      // Try to get conversations from Supabase
+      final conversations = await SupabaseService.getConversations();
+      if (conversations.isNotEmpty) {
+        // Get the most recent message from each conversation
+        List<ChatMessage> recentMessages = [];
+        for (final conversation in conversations) {
+          final messages = await SupabaseService.getMessages(conversation.id);
+          if (messages.isNotEmpty) {
+            recentMessages.add(messages.last);
+          }
+        }
+        return recentMessages;
+      }
+    } catch (e) {
+      print('Error fetching messages from Supabase: $e');
+    }
+
+    // Fallback to sample data
+    return getSampleMessages();
   }
 }
 
@@ -195,8 +475,31 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  final List<User> users = DataService.getUsers();
+  List<User> users = [];
   int currentIndex = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    try {
+      final loadedUsers = await DataService.getUsers();
+      setState(() {
+        users = loadedUsers;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading users: $e');
+      setState(() {
+        users = DataService.getSampleUsers();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,120 +509,123 @@ class _ExplorePageState extends State<ExplorePage> {
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
-      body: users.isEmpty
-          ? const Center(child: Text('No more profiles to show'))
-          : Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.all(16),
-                    child: Card(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : users.isEmpty
+              ? const Center(child: Text('No profiles to show'))
+              : Column(
+                  children: [
+                    Expanded(
                       child: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.teal.shade50, Colors.white],
+                        margin: const EdgeInsets.all(16),
+                        child: Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Center(
-                              child: Text(
-                                users[currentIndex].profileImage,
-                                style: const TextStyle(fontSize: 80),
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Colors.teal.shade50, Colors.white],
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            Text(
-                              '${users[currentIndex].name}, ${users[currentIndex].age}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  color: Colors.grey,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  users[currentIndex].location,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
+                                Center(
+                                  child: Text(
+                                    users[currentIndex].profileImage,
+                                    style: const TextStyle(fontSize: 80),
                                   ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  '${users[currentIndex].name}, ${users[currentIndex].age}',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on,
+                                      color: Colors.grey,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      users[currentIndex].location,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  users[currentIndex].bio ?? 'No bio available',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Interests:',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  children: users[currentIndex].interests.map((
+                                    interest,
+                                  ) {
+                                    return Chip(
+                                      label: Text(interest.name),
+                                      backgroundColor: Colors.teal.shade100,
+                                    );
+                                  }).toList(),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              users[currentIndex].bio,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Interests:',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              children: users[currentIndex].interests.map((
-                                interest,
-                              ) {
-                                return Chip(
-                                  label: Text(interest),
-                                  backgroundColor: Colors.teal.shade100,
-                                );
-                              }).toList(),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                        onPressed: () {
-                          _nextProfile();
-                        },
-                        backgroundColor: Colors.red,
-                        heroTag: "pass",
-                        child: const Icon(Icons.close, color: Colors.white),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          FloatingActionButton(
+                            onPressed: () {
+                              _nextProfile();
+                            },
+                            backgroundColor: Colors.red,
+                            heroTag: "pass",
+                            child: const Icon(Icons.close, color: Colors.white),
+                          ),
+                          FloatingActionButton(
+                            onPressed: () {
+                              _likeProfile();
+                            },
+                            backgroundColor: Colors.green,
+                            heroTag: "like",
+                            child:
+                                const Icon(Icons.favorite, color: Colors.white),
+                          ),
+                        ],
                       ),
-                      FloatingActionButton(
-                        onPressed: () {
-                          _likeProfile();
-                        },
-                        backgroundColor: Colors.green,
-                        heroTag: "like",
-                        child: const Icon(Icons.favorite, color: Colors.white),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
     );
   }
 
@@ -333,13 +639,32 @@ class _ExplorePageState extends State<ExplorePage> {
     });
   }
 
-  void _likeProfile() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('You liked ${users[currentIndex].name}!'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  void _likeProfile() async {
+    final currentUser = users[currentIndex];
+
+    try {
+      // Like the user in the database
+      await SupabaseService.likeUser(currentUser.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You liked ${currentUser.name}!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Log the activity
+      await SupabaseService.logActivity(
+          'like', {'liked_user_id': currentUser.id});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error liking profile: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
     _nextProfile();
   }
 }
@@ -353,8 +678,9 @@ class DiscoverPage extends StatefulWidget {
 }
 
 class _DiscoverPageState extends State<DiscoverPage> {
-  List<User> users = DataService.getUsers();
+  List<User> users = [];
   List<User> filteredUsers = [];
+  bool isLoading = true;
   String selectedAgeRange = 'All Ages';
   String selectedLocation = 'All Locations';
   String selectedInterest = 'All Interests';
@@ -379,7 +705,25 @@ class _DiscoverPageState extends State<DiscoverPage> {
   @override
   void initState() {
     super.initState();
-    filteredUsers = users;
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    try {
+      final loadedUsers = await DataService.getUsers();
+      setState(() {
+        users = loadedUsers;
+        filteredUsers = loadedUsers;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading users: $e');
+      setState(() {
+        users = DataService.getSampleUsers();
+        filteredUsers = DataService.getSampleUsers();
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -390,170 +734,231 @@ class _DiscoverPageState extends State<DiscoverPage> {
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.grey.shade100,
-            child: Column(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Age Range',
-                          border: OutlineInputBorder(),
-                        ),
-                        value: selectedAgeRange,
-                        items: ageRanges.map((String age) {
-                          return DropdownMenuItem<String>(
-                            value: age,
-                            child: Text(age),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedAgeRange = newValue!;
-                            _applyFilters();
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          labelText: 'Location',
-                          border: OutlineInputBorder(),
-                        ),
-                        value: selectedLocation,
-                        items: locations.map((String location) {
-                          return DropdownMenuItem<String>(
-                            value: location,
-                            child: Text(location),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedLocation = newValue!;
-                            _applyFilters();
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Interest',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: selectedInterest,
-                  items: interests.map((String interest) {
-                    return DropdownMenuItem<String>(
-                      value: interest,
-                      child: Text(interest),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedInterest = newValue!;
-                      _applyFilters();
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: filteredUsers.length,
-              itemBuilder: (context, index) {
-                final user = filteredUsers[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Text(
-                        user.profileImage,
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                    ),
-                    title: Text('${user.name}, ${user.age}'),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 16,
-                              color: Colors.grey,
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.grey.shade100,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'Age Range',
+                                border: OutlineInputBorder(),
+                              ),
+                              value: selectedAgeRange,
+                              items: ageRanges.map((String age) {
+                                return DropdownMenuItem<String>(
+                                  value: age,
+                                  child: Text(age),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedAgeRange = newValue!;
+                                  _applyFilters();
+                                });
+                              },
                             ),
-                            const SizedBox(width: 4),
-                            Text(user.location),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user.bio,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: user.status == 'online'
-                                ? Colors.green
-                                : Colors.grey,
-                            shape: BoxShape.circle,
                           ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                labelText: 'Location',
+                                border: OutlineInputBorder(),
+                              ),
+                              value: selectedLocation,
+                              items: locations.map((String location) {
+                                return DropdownMenuItem<String>(
+                                  value: location,
+                                  child: Text(location),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedLocation = newValue!;
+                                  _applyFilters();
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Interest',
+                          border: OutlineInputBorder(),
                         ),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward_ios),
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OtherProfilePage(user: user),
+                        value: selectedInterest,
+                        items: interests.map((String interest) {
+                          return DropdownMenuItem<String>(
+                            value: interest,
+                            child: Text(interest),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedInterest = newValue!;
+                            _applyFilters();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredUsers.length,
+                    itemBuilder: (context, index) {
+                      final user = filteredUsers[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(16),
+                          leading: CircleAvatar(
+                            radius: 30,
+                            child: Text(
+                              user.profileImage,
+                              style: const TextStyle(fontSize: 30),
+                            ),
+                          ),
+                          title: Text('${user.name}, ${user.age}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(user.location),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                user.bio ?? 'No bio available',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: user.status == 'online'
+                                      ? Colors.green
+                                      : Colors.grey,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_ios),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    OtherProfilePage(user: user),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
-  void _applyFilters() {
-    filteredUsers = users.where((user) {
-      bool ageMatch = selectedAgeRange == 'All Ages' ||
-          _isAgeInRange(user.age, selectedAgeRange);
-      bool locationMatch = selectedLocation == 'All Locations' ||
-          user.location == selectedLocation;
-      bool interestMatch = selectedInterest == 'All Interests' ||
-          user.interests.contains(selectedInterest);
+  void _applyFilters() async {
+    setState(() {
+      isLoading = true;
+    });
 
-      return ageMatch && locationMatch && interestMatch;
-    }).toList();
+    try {
+      // Determine age range
+      int? minAge, maxAge;
+      switch (selectedAgeRange) {
+        case '60-65':
+          minAge = 60;
+          maxAge = 65;
+          break;
+        case '66-70':
+          minAge = 66;
+          maxAge = 70;
+          break;
+        case '71-75':
+          minAge = 71;
+          maxAge = 75;
+          break;
+        case '76+':
+          minAge = 76;
+          break;
+      }
+
+      // Determine location filter
+      String? locationFilter =
+          selectedLocation == 'All Locations' ? null : selectedLocation;
+
+      // Get filtered users from Supabase
+      final filteredUsersFromDb = await SupabaseService.getDiscoverableUsers(
+        minAge: minAge,
+        maxAge: maxAge,
+        location: locationFilter,
+      );
+
+      // Apply interest filter locally (since it's more complex)
+      List<User> finalFilteredUsers = filteredUsersFromDb.cast<User>();
+      if (selectedInterest != 'All Interests') {
+        finalFilteredUsers = filteredUsersFromDb
+            .where((user) => user.interest
+                .any((interest) => interest.name == selectedInterest))
+            .cast<User>()
+            .toList();
+      }
+
+      setState(() {
+        filteredUsers = finalFilteredUsers;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error applying filters: $e');
+      // Fallback to local filtering
+      filteredUsers = users.where((user) {
+        bool ageMatch = selectedAgeRange == 'All Ages' ||
+            _isAgeInRange(user.age, selectedAgeRange);
+        bool locationMatch = selectedLocation == 'All Locations' ||
+            user.location == selectedLocation;
+        bool interestMatch = selectedInterest == 'All Interests' ||
+            user.interests.any((interest) => interest.name == selectedInterest);
+
+        return ageMatch && locationMatch && interestMatch;
+      }).toList();
+
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   bool _isAgeInRange(int age, String range) {
@@ -581,8 +986,34 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final List<ChatMessage> messages = DataService.getMessages();
-  final List<User> users = DataService.getUsers();
+  List<ChatMessage> messages = [];
+  List<User> users = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final loadedMessages = await DataService.getMessages();
+      final loadedUsers = await DataService.getUsers();
+      setState(() {
+        messages = loadedMessages;
+        users = loadedUsers;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading chat data: $e');
+      setState(() {
+        messages = DataService.getSampleMessages();
+        users = DataService.getSampleUsers();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -592,56 +1023,60 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
-      body: messages.isEmpty
-          ? const Center(
-              child: Text(
-                'No messages yet\nStart exploring to connect with people!',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            )
-          : ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                final sender = users.firstWhere(
-                  (user) => user.id == message.senderId,
-                );
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : messages.isEmpty
+              ? const Center(
+                  child: Text(
+                    'No messages yet\nStart exploring to connect with people!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    final sender = users.firstWhere(
+                      (user) => user.id == message.senderId,
+                    );
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text(
-                        sender.profileImage,
-                        style: const TextStyle(fontSize: 20),
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                    ),
-                    title: Text(sender.name),
-                    subtitle: Text(
-                      message.message,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Text(
-                      _formatTime(message.timestamp),
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatDetailPage(user: sender),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          child: Text(
+                            sender.profileImage,
+                            style: const TextStyle(fontSize: 20),
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
+                        title: Text(sender.name),
+                        subtitle: Text(
+                          message.message,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Text(
+                          _formatTime(message.timestamp),
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ChatDetailPage(user: sender),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
     );
   }
 
@@ -671,25 +1106,95 @@ class ChatDetailPage extends StatefulWidget {
 
 class _ChatDetailPageState extends State<ChatDetailPage> {
   final TextEditingController _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [];
+  List<Map<String, dynamic>> _messages = [];
+  String? conversationId;
+  RealtimeChannel? _messagesSubscription;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _messages.addAll([
-      {
-        'message':
-            'Hello! I saw your profile and thought we might have a lot in common.',
-        'isMe': false,
-        'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
-      },
-      {
-        'message':
-            'Hi! Thank you for reaching out. I\'d love to get to know you better.',
-        'isMe': true,
-        'timestamp': DateTime.now().subtract(const Duration(hours: 1)),
-      },
-    ]);
+    _loadMessages();
+    _setupRealtimeSubscription();
+  }
+
+  @override
+  void dispose() {
+    _messagesSubscription?.unsubscribe();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMessages() async {
+    try {
+      // In a real app, you would get the conversation ID from the widget or find it
+      // For now, we'll create a simple conversation ID based on user IDs
+      final currentUserId = SupabaseService.currentUserId;
+      if (currentUserId != null) {
+        // Try to find existing conversation or messages
+        final conversations = await SupabaseService.getConversations();
+        final conversation = conversations.firstWhere(
+          (conv) =>
+              (conv.user1Id == currentUserId &&
+                  conv.user2Id == widget.user.id) ||
+              (conv.user1Id == widget.user.id && conv.user2Id == currentUserId),
+          orElse: () => throw Exception('No conversation found'),
+        );
+
+        conversationId = conversation.id;
+        final messages = await SupabaseService.getMessages(conversationId!);
+
+        setState(() {
+          _messages = messages
+              .map((msg) => {
+                    'message': msg.content,
+                    'isMe': msg.senderId == currentUserId,
+                    'timestamp': msg.createdAt,
+                  })
+              .toList();
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading messages: $e');
+      // Fallback to sample data
+      setState(() {
+        _messages.addAll([
+          {
+            'message':
+                'Hello! I saw your profile and thought we might have a lot in common.',
+            'isMe': false,
+            'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
+          },
+          {
+            'message':
+                'Hi! Thank you for reaching out. I\'d love to get to know you better.',
+            'isMe': true,
+            'timestamp': DateTime.now().subtract(const Duration(hours: 1)),
+          },
+        ]);
+        isLoading = false;
+      });
+    }
+  }
+
+  void _setupRealtimeSubscription() {
+    if (conversationId != null) {
+      _messagesSubscription = SupabaseService.subscribeToMessages(
+        conversationId!,
+        (message) {
+          if (mounted) {
+            setState(() {
+              _messages.add({
+                'message': message.content,
+                'isMe': message.senderId == SupabaseService.currentUserId,
+                'timestamp': message.createdAt,
+              });
+            });
+          }
+        },
+      );
+    }
   }
 
   @override
@@ -723,18 +1228,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                return _buildMessageBubble(
-                  message['message'],
-                  message['isMe'],
-                  message['timestamp'],
-                );
-              },
-            ),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final message = _messages[index];
+                      return _buildMessageBubble(
+                        message['message'],
+                        message['isMe'],
+                        message['timestamp'],
+                      );
+                    },
+                  ),
           ),
           Container(
             padding: const EdgeInsets.all(16),
@@ -802,16 +1309,37 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     );
   }
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
-      setState(() {
-        _messages.add({
-          'message': _messageController.text.trim(),
-          'isMe': true,
-          'timestamp': DateTime.now(),
-        });
+  void _sendMessage() async {
+    if (_messageController.text.trim().isEmpty) return;
+
+    final messageText = _messageController.text.trim();
+    _messageController.clear();
+
+    // Add message to UI immediately
+    setState(() {
+      _messages.add({
+        'message': messageText,
+        'isMe': true,
+        'timestamp': DateTime.now(),
       });
-      _messageController.clear();
+    });
+
+    try {
+      if (conversationId != null) {
+        await SupabaseService.sendMessage(
+          conversationId: conversationId!,
+          receiverId: widget.user.id,
+          content: messageText,
+        );
+      }
+    } catch (e) {
+      print('Error sending message: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send message: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -821,8 +1349,51 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 }
 
 // Profile Page
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  User? currentUserProfile;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentProfile();
+  }
+
+  Future<void> _loadCurrentProfile() async {
+    try {
+      final profile = await SupabaseService.getCurrentProfile();
+      setState(() {
+        currentUserProfile = profile as User?;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading profile: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await SupabaseService.signOut();
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AuthScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing out: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -838,107 +1409,126 @@ class ProfilePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const EditProfilePage(),
+                  builder: (context) =>
+                      EditProfilePage(currentProfile: currentUserProfile),
                 ),
-              );
+              ).then(
+                  (_) => _loadCurrentProfile()); // Reload profile after editing
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  const Text('👤', style: TextStyle(fontSize: 80)),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'John Doe, 65',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.location_on, color: Colors.grey, size: 18),
-                      SizedBox(width: 4),
-                      Text('Boston, MA', style: TextStyle(color: Colors.grey)),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : currentUserProfile == null
+              ? const Center(child: Text('No profile data available'))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(currentUserProfile!.profileImage,
+                                style: const TextStyle(fontSize: 80)),
+                            const SizedBox(height: 10),
+                            Text(
+                              '${currentUserProfile!.fullName}, ${currentUserProfile!.age}',
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: Colors.grey, size: 18),
+                                const SizedBox(width: 4),
+                                Text(currentUserProfile!.location,
+                                    style: const TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      const Text(
+                        'About Me',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        currentUserProfile!.bio ??
+                            'No bio available yet. Add one by editing your profile!',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'My Interests',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      currentUserProfile!.interests.isEmpty
+                          ? const Text(
+                              'No interests added yet. Add some by editing your profile!',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            )
+                          : Wrap(
+                              spacing: 8,
+                              children:
+                                  currentUserProfile!.interests.map((interest) {
+                                return Chip(
+                                  label: Text(interest.name),
+                                  backgroundColor: Colors.teal.shade100,
+                                );
+                              }).toList(),
+                            ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfilePage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Edit Profile',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _showSettingsDialog(context);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.teal),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Settings',
+                            style: TextStyle(fontSize: 16, color: Colors.teal),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              'About Me',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Retired engineer who loves to stay active. Enjoy hiking, reading mystery novels, and cooking for friends and family. Looking for someone special to share new adventures with.',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'My Interests',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              children: ['Hiking', 'Reading', 'Cooking', 'Travel', 'Movies']
-                  .map((interest) {
-                return Chip(
-                  label: Text(interest),
-                  backgroundColor: Colors.teal.shade100,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfilePage(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                child: const Text(
-                  'Edit Profile',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  _showSettingsDialog(context);
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.teal),
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                child: const Text(
-                  'Settings',
-                  style: TextStyle(fontSize: 16, color: Colors.teal),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -954,22 +1544,35 @@ class ProfilePage extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.notifications),
                 title: const Text('Notifications'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // TODO: Implement notifications settings
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.privacy_tip),
                 title: const Text('Privacy'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // TODO: Implement privacy settings
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.help),
                 title: const Text('Help & Support'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // TODO: Implement help & support
+                },
               ),
               ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
-                onTap: () {},
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title:
+                    const Text('Logout', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _signOut();
+                },
               ),
             ],
           ),
@@ -989,20 +1592,80 @@ class ProfilePage extends StatelessWidget {
 
 // Edit Profile Page
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  final User? currentProfile;
+
+  const EditProfilePage({super.key, this.currentProfile});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _nameController = TextEditingController(text: 'John Doe');
-  final _ageController = TextEditingController(text: '65');
-  final _locationController = TextEditingController(text: 'Boston, MA');
-  final _bioController = TextEditingController(
-    text:
-        'Retired engineer who loves to stay active. Enjoy hiking, reading mystery novels, and cooking for friends and family. Looking for someone special to share new adventures with.',
-  );
+  late final TextEditingController _nameController;
+  late final TextEditingController _ageController;
+  late final TextEditingController _locationController;
+  late final TextEditingController _bioController;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = widget.currentProfile;
+    _nameController = TextEditingController(text: profile?.fullName ?? '');
+    _ageController = TextEditingController(text: profile?.age.toString() ?? '');
+    _locationController = TextEditingController(text: profile?.location ?? '');
+    _bioController = TextEditingController(text: profile?.bio ?? '');
+  }
+
+  Future<void> _saveProfile() async {
+    if (_nameController.text.isEmpty ||
+        _ageController.text.isEmpty ||
+        _locationController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all required fields')),
+      );
+      return;
+    }
+
+    final age = int.tryParse(_ageController.text);
+    if (age == null || age < 18 || age > 120) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid age (18-120)')),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await SupabaseService.updateProfile({
+        'full_name': _nameController.text.trim(),
+        'age': age,
+        'location': _locationController.text.trim(),
+        'bio': _bioController.text.trim(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile updated successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating profile: ${e.toString()}')),
+      );
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1170,7 +1833,8 @@ class OtherProfilePage extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(user.bio, style: const TextStyle(fontSize: 16)),
+            Text(user.bio ?? 'No bio available',
+                style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
             const Text(
               'Interests',
@@ -1181,7 +1845,7 @@ class OtherProfilePage extends StatelessWidget {
               spacing: 8,
               children: user.interests.map((interest) {
                 return Chip(
-                  label: Text(interest),
+                  label: Text(interest.name),
                   backgroundColor: Colors.teal.shade100,
                 );
               }).toList(),
