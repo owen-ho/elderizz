@@ -76,7 +76,7 @@ class _InterestsManagementPageState extends State<InterestsManagementPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Interests'),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
         actions: [
           if (!isLoading)
@@ -94,7 +94,9 @@ class _InterestsManagementPageState extends State<InterestsManagementPage> {
                   : const Text(
                       'Save',
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
             ),
         ],
@@ -102,40 +104,37 @@ class _InterestsManagementPageState extends State<InterestsManagementPage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : allInterests.isEmpty
-              ? const Center(child: Text('No interests available'))
-              : Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      color: Colors.grey.shade100,
-                      child: Text(
-                        'Select your interests to help others find you and to improve your matches.',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.all(16),
-                        children: [
-                          Text(
-                            'Selected: ${selectedInterestIds.length} interests',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInterestGrid(),
-                        ],
-                      ),
-                    ),
-                  ],
+          ? const Center(child: Text('No interests available'))
+          : Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.grey.shade100,
+                  child: Text(
+                    'Select your interests to help others find you and to improve your matches.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Text(
+                        'Selected: ${selectedInterestIds.length} interests',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildInterestGrid(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
@@ -192,9 +191,9 @@ class _InterestsManagementPageState extends State<InterestsManagementPage> {
                       }
                     });
                   },
-                  selectedColor: Colors.teal.shade100,
+                  selectedColor: getMaterialColor(appTheme).shade100,
                   backgroundColor: Colors.grey.shade200,
-                  checkmarkColor: Colors.teal,
+                  checkmarkColor: appTheme,
                 );
               }).toList(),
             ),

@@ -21,7 +21,10 @@ class _AuthScreenState extends State<AuthScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.teal.shade300, Colors.teal.shade600],
+            colors: [
+              getMaterialColor(appTheme).shade300,
+              getMaterialColor(appTheme).shade600,
+            ],
           ),
         ),
         child: SafeArea(
@@ -38,14 +41,17 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('💕', style: TextStyle(fontSize: 64)),
+                      ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                        child: Image.asset('assets/icon/icon.png'),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'Elderizz',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          color: appTheme,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -70,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           isSignUp
                               ? 'Already have an account? Sign In'
                               : 'Don\'t have an account? Sign Up',
-                          style: const TextStyle(color: Colors.teal),
+                          style: const TextStyle(color: appTheme),
                         ),
                       ),
                     ],
@@ -164,7 +170,7 @@ class _SignInFormState extends State<SignInForm> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _signIn,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
+              backgroundColor: appTheme,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -339,7 +345,7 @@ class _SignUpFormState extends State<SignUpForm> {
           child: ElevatedButton(
             onPressed: _isLoading ? null : _signUp,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
+              backgroundColor: appTheme,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
