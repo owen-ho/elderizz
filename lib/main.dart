@@ -1894,7 +1894,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       );
       Navigator.pop(context);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint("Error updating profile: ${e.toString()}");
+      debugPrint("Error updating profile: ${stackTrace.toString()}");
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error updating profile: ${e.toString()}')),
