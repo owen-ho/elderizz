@@ -260,9 +260,10 @@ class _SignUpFormState extends State<SignUpForm> {
           MaterialPageRoute(builder: (context) => const ElderlyDatingApp()),
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (!mounted) return;
       debugPrint('Sign up error: $e');
+      debugPrint('Sign up error: $stackTrace');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign up failed: ${e.toString()}')),
       );
