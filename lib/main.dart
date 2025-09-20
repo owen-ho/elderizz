@@ -631,12 +631,21 @@ class _ExplorePageState extends State<ExplorePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Center(
-                                  child: ProfileImageWidget(
-                                    imageUrl:
-                                        users[currentIndex].profileImageUrl,
-                                    size: 300,
-                                    isCircular: false,
-                                  ),
+                                  child:
+                                      users[currentIndex].profileImage
+                                          .startsWith('http')
+                                      ? Image.network(
+                                          users[currentIndex].profileImage,
+                                          height: 300,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          users[currentIndex].profileImage,
+                                          height: 300,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                                 const SizedBox(height: 20),
                                 Flexible(
