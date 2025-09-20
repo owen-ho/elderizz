@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Elderizz',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+        primarySwatch: getMaterialColor(appTheme),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: const TextTheme(
           bodyLarge: TextStyle(fontSize: 16),
@@ -80,7 +80,7 @@ class ElderlyDatingApp extends StatelessWidget {
     return MaterialApp(
       title: 'Elderizz',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+        primarySwatch: getMaterialColor(appTheme),
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: const TextTheme(
           bodyLarge: TextStyle(fontSize: 16),
@@ -121,7 +121,7 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
         },
-        selectedItemColor: Colors.teal,
+        selectedItemColor: appTheme,
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
@@ -549,7 +549,7 @@ class _ExplorePageState extends State<ExplorePage> {
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [Colors.teal.shade50, Colors.white],
+                                colors: [getMaterialColor(appTheme).shade50, Colors.white],
                               ),
                             ),
                             child: Column(
@@ -619,7 +619,7 @@ class _ExplorePageState extends State<ExplorePage> {
                                                 return Chip(
                                                   label: Text(interest.name),
                                                   backgroundColor:
-                                                      Colors.teal.shade100,
+                                                      getMaterialColor(appTheme).shade100,
                                                 );
                                               })
                                               .toList(),
@@ -772,7 +772,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Discover'),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
       ),
       body: isLoading
@@ -795,10 +795,10 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         child: ChoiceChip(
                           label: Text(interest),
                           selected: isSelected,
-                          selectedColor: Colors.teal,
-                          backgroundColor: Colors.teal.shade50,
+                          selectedColor: appTheme,
+                          backgroundColor: getMaterialColor(appTheme).shade50,
                           labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.teal,
+                            color: isSelected ? Colors.white : appTheme,
                             fontWeight: FontWeight.bold,
                           ),
                           onSelected: (selected) {
@@ -1025,7 +1025,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chats'),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
       ),
       body: isLoading
@@ -1219,7 +1219,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             ),
           ],
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
       ),
       body: Column(
@@ -1261,7 +1261,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 FloatingActionButton(
                   mini: true,
                   onPressed: _sendMessage,
-                  backgroundColor: Colors.teal,
+                  backgroundColor: appTheme,
                   child: const Icon(Icons.send, color: Colors.white),
                 ),
               ],
@@ -1279,7 +1279,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isMe ? Colors.teal : Colors.grey.shade200,
+          color: isMe ? appTheme : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -1397,7 +1397,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Profile'),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -1485,7 +1485,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ) {
                             return Chip(
                               label: Text(interest.name),
-                              backgroundColor: Colors.teal.shade100,
+                              backgroundColor: getMaterialColor(appTheme).shade100,
                             );
                           }).toList(),
                         ),
@@ -1502,7 +1502,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
+                        backgroundColor: appTheme,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       child: const Text(
@@ -1519,12 +1519,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         _showSettingsDialog(context);
                       },
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.teal),
+                        side: const BorderSide(color: appTheme),
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                       child: const Text(
                         'Settings',
-                        style: TextStyle(fontSize: 16, color: Colors.teal),
+                        style: TextStyle(fontSize: 16, color: appTheme),
                       ),
                     ),
                   ),
@@ -1676,7 +1676,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -1739,7 +1739,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: appTheme,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
                 child: const Text(
@@ -1766,7 +1766,7 @@ class OtherProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(user.name),
-        backgroundColor: Colors.teal,
+        backgroundColor: appTheme,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -1852,7 +1852,7 @@ class OtherProfilePage extends StatelessWidget {
               children: user.interests.map((interest) {
                 return Chip(
                   label: Text(interest.name),
-                  backgroundColor: Colors.teal.shade100,
+                  backgroundColor: getMaterialColor(appTheme).shade100,
                 );
               }).toList(),
             ),
@@ -1897,7 +1897,7 @@ class OtherProfilePage extends StatelessWidget {
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
+                      backgroundColor: appTheme,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                   ),
