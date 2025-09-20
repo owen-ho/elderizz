@@ -430,7 +430,9 @@ class DataService {
       // Try to get users from Supabase
       final users = await SupabaseService.getDiscoverableUsers();
       if (users.isNotEmpty) {
-        return users.cast<UserModel>();
+        // TODO: Make sample users so dont need sample
+        //return users.cast<UserModel>();
+        return [...getSampleUsers(), ...users.cast<UserModel>()];
       }
     } catch (e) {
       print('Error fetching users from Supabase: $e');
@@ -549,7 +551,10 @@ class _ExplorePageState extends State<ExplorePage> {
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [getMaterialColor(appTheme).shade50, Colors.white],
+                                colors: [
+                                  getMaterialColor(appTheme).shade50,
+                                  Colors.white,
+                                ],
                               ),
                             ),
                             child: Column(
@@ -619,7 +624,9 @@ class _ExplorePageState extends State<ExplorePage> {
                                                 return Chip(
                                                   label: Text(interest.name),
                                                   backgroundColor:
-                                                      getMaterialColor(appTheme).shade100,
+                                                      getMaterialColor(
+                                                        appTheme,
+                                                      ).shade100,
                                                 );
                                               })
                                               .toList(),
@@ -1053,7 +1060,7 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   child: ListTile(
                     leading: CircleAvatar(
-                      child: Image.asset(sender.profileImage),
+                      foregroundImage: AssetImage(sender.profileImage),
                     ),
                     title: Text(sender.name),
                     subtitle: Text(
@@ -1205,7 +1212,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(child: Image.asset(widget.user.profileImage)),
+            CircleAvatar(foregroundImage: AssetImage(widget.user.profileImage)),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1485,7 +1492,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           ) {
                             return Chip(
                               label: Text(interest.name),
-                              backgroundColor: getMaterialColor(appTheme).shade100,
+                              backgroundColor: getMaterialColor(
+                                appTheme,
+                              ).shade100,
                             );
                           }).toList(),
                         ),
