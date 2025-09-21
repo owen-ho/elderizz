@@ -1,3 +1,4 @@
+![https://github.com/owen-ho/elderizz/blob/master/assets/icon/icon.png](https://github.com/owen-ho/elderizz/blob/master/assets/icon/icon.png)
 # Elderizz 💕
 
 **Elderizz** is a modern dating application specifically designed for mature adults (50+) looking for meaningful connections. The app combines the convenience of modern dating technology with features tailored to the preferences and needs of older adults.
